@@ -4,20 +4,18 @@ import {
   HttpLink,
   InMemoryCache,
   split,
-} from '@apollo/client';
-import { RetryLink } from '@apollo/client/link/retry';
-import { setContext } from '@apollo/client/link/context';
-import { getMainDefinition } from '@apollo/client/utilities';
-import { Socket as PhoenixSocket } from 'phoenix';
-import * as AbsintheSocket from '@absinthe/socket';
-import { createAbsintheSocketLink } from '@absinthe/socket-apollo-link';
-import { getToken } from '../../lib/auth';
+} from "@apollo/client";
+import { RetryLink } from "@apollo/client/link/retry";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { Socket as PhoenixSocket } from "phoenix";
+import * as AbsintheSocket from "@absinthe/socket";
+import { createAbsintheSocketLink } from "@absinthe/socket-apollo-link";
 
 // Http link
 const baseHttpLink = new HttpLink(
-  process.env.NODE_ENV === 'production'
-    ? { uri: 'https://live.worldcubeassociation.org/api', credentials: 'same-origin' }
-    : { uri: 'https://live.worldcubeassociation.org/api', credentials: 'same-origin' }
+  import.meta.env.PROD
+    ? { uri: 'https://live.worldcubeassociation.org/api', credentials: "same-origin" }
+    : { uri: 'https://live.worldcubeassociation.org/api', credentials: "same-origin" },
 );
 
 const retryLink = new RetryLink({
@@ -29,29 +27,17 @@ const retryLink = new RetryLink({
   },
 });
 
-const authLink = setContext((request, { headers }) => {
-  const token = getToken();
-  if (!token) return { headers };
-  return {
-    headers: {
-      ...headers,
-      authorization: `Bearer ${token}`,
-    },
-  };
-});
-
-const httpLink =
-  process.env.NODE_ENV === 'production'
-    ? ApolloLink.from([authLink, retryLink, baseHttpLink])
-    : ApolloLink.from([authLink, baseHttpLink]);
+const httpLink = import.meta.env.PROD
+  ? ApolloLink.from([retryLink, baseHttpLink])
+  : ApolloLink.from([baseHttpLink]);
 
 // WebSocket link
 
 // Create a standard Phoenix websocket connection.
 const phoenixSocket = new PhoenixSocket(
-  process.env.NODE_ENV === 'production'
+  import.meta.env.PROD
     ? `wss://${window.location.host}/socket`
-    : 'ws://localhost:4000/socket'
+    : "ws://localhost:4000/socket",
 );
 
 // Wrap the Phoenix socket in an AbsintheSocket.
@@ -66,27 +52,36 @@ const link = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
     return (
-      definition.kind === 'OperationDefinition' &&
-      definition.operation === 'subscription'
+      definition.kind === "OperationDefinition" &&
+      definition.operation === "subscription"
     );
   },
   wsLink,
-  httpLink
+  httpLink,
 );
 
 const cache = new InMemoryCache({
   typePolicies: {
     Country: {
-      keyFields: ['iso2'],
+      keyFields: ["iso2"],
     },
     CompetitionBrief: {
-      keyFields: ['wcaId'],
+      keyFields: ["wcaId"],
     },
     Competition: {
       fields: {
         access: {
           merge(existing, incoming) {
             return { ...existing, ...incoming };
+          },
+        },
+      },
+    },
+    Result: {
+      fields: {
+        attempts: {
+          merge(existing, incoming) {
+            return incoming;
           },
         },
       },
@@ -101,7 +96,7 @@ export const client = new ApolloClient({
     watchQuery: {
       // Fetch data from cache if available, but always perform a request
       // to get the latest data.
-      fetchPolicy: 'cache-and-network',
+      fetchPolicy: "cache-and-network",
     },
   },
 });

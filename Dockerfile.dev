@@ -1,0 +1,32 @@
+ARG ELIXIR_VERSION=1.17.2
+ARG OTP_VERSION=27.0.1
+ARG DEBIAN_VERSION=bullseye-20240722-slim
+
+ARG IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
+
+FROM ${IMAGE}
+
+# Install build dependencies
+RUN apt-get update -y && apt-get install -y build-essential git && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    apt-get clean && rm -f /var/lib/apt/lists/*_*
+
+# Install runtime dependencies
+RUN apt-get update -y && \
+  apt-get install -y libstdc++6 openssl libncurses5 locales \
+    # PDF generation
+    wkhtmltopdf fonts-freefont-ttf
+
+ENV HOME=/home/app
+# Create home dir explicitly, in case someone runs with `--user`
+RUN mkdir $HOME && chmod 777 $HOME
+
+# Install hex and rebar
+RUN mix local.hex --force && \
+    mix local.rebar --force
+
+WORKDIR /app
+
+CMD [ "sh", "-c", "mix setup; mix phx.server" ]

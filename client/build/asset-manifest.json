@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.js": "/static/js/main.d0f597fc.chunk.js",
+    "runtime-main.js": "/static/js/runtime-main.99248a6c.js",
+    "static/css/2.fd6fb1ee.chunk.css": "/static/css/2.fd6fb1ee.chunk.css",
+    "static/js/2.62009cfe.chunk.js": "/static/js/2.62009cfe.chunk.js",
+    "index.html": "/index.html",
+    "service-worker.js": "/service-worker.js",
+    "static/js/2.62009cfe.chunk.js.LICENSE.txt": "/static/js/2.62009cfe.chunk.js.LICENSE.txt",
+    "static/media/about.91bf4591.svg": "/static/media/about.91bf4591.svg",
+    "static/media/flag-icon.css": "/static/media/zw.f5ceeff7.svg",
+    "static/media/error.891f05e0.svg": "/static/media/error.891f05e0.svg",
+    "static/media/logo.513c1572.svg": "/static/media/logo.513c1572.svg",
+    "static/media/wca-logo.513c1572.svg": "/static/media/wca-logo.513c1572.svg"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.99248a6c.js",
+    "static/css/2.fd6fb1ee.chunk.css",
+    "static/js/2.62009cfe.chunk.js",
+    "static/js/main.d0f597fc.chunk.js"
+  ]
+}
