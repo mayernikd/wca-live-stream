@@ -57,21 +57,40 @@ export async function UpdateStreamRoundResults(round, rankRange) {
 
     let eventId = round.competitionEvent.event.id;
 
-    round.results.forEach((result, index) => {
-        if (result.ranking !== null && result.ranking > rankRange && result.ranking < (rankRange + 9)) {
-            const idx = index % 8
-            //model
-            data.model.fields.push({ "defaultValue": "", "id": `player${idx}name`, "title": `Player ${idx} Name`, "type": "text" });
-            data.model.fields.push({ "defaultValue": "", "id": `player${idx}country`, "title": `Player ${idx} Country`, "type": "text" });
-            data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveAverage`, "title": `Player ${idx} Average`, "type": "text" });
-            data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveBest`, "title": `Player ${idx} Best`, "type": "text" });
-            data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveRank`, "title": `Player ${idx} Rank`, "type": "text" });
-            data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveAdvancing`, "title": `Player ${idx} Advancing`, "type": "text" });
-            data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveCount`, "title": `Player ${idx} Solve Count`, "type": "text" });
+    for(var idx=0; idx < 8; idx++){
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}name`, "title": `Player ${idx} Name`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}country`, "title": `Player ${idx} Country`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}countryFlag`, "title": `Player ${idx} Country Flag`, "type": "image" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveAverage`, "title": `Player ${idx} Average`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveBest`, "title": `Player ${idx} Best`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveRank`, "title": `Player ${idx} Rank`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveAdvancing`, "title": `Player ${idx} Advancing`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveCount`, "title": `Player ${idx} Solve Count`, "type": "text" });
 
+        data.payload[`player${idx}name`] = "";
+        data.payload[`player${idx}country`] = "";
+        data.payload[`player${idx}countryFlag`] = "";
+        data.payload[`player${idx}solveAverage`] = "";
+        data.payload[`player${idx}solveBest`] = "";
+        data.payload[`player${idx}solveRank`] = "";
+        data.payload[`player${idx}solveAdvancing`] = "";
+        data.payload[`player${idx}solveCount`] = "";
+        data.payload[`player${idx}solve0`] = "";
+        data.payload[`player${idx}solve1`] = "";
+        data.payload[`player${idx}solve2`] = "";
+        data.payload[`player${idx}solve3`] = "";
+        data.payload[`player${idx}solve4`] = "";
+    }
+
+    round.results.forEach((result, index) => {
+        const idx = index % 8
+        //model
+        
+        if (result.ranking !== null && result.ranking > rankRange && result.ranking < (rankRange + 9)) {
             //payload
             data.payload[`player${idx}name`] = result.person.name;
             data.payload[`player${idx}country`] = result.person.country.iso2;
+            data.payload[`player${idx}countryFlag`] = `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${result.person.country.iso2.toLowerCase()}.svg`;
             data.payload[`player${idx}solveAverage`] = formatAttemptResult(result.average, eventId);
             data.payload[`player${idx}solveBest`] = formatAttemptResult(result.best, eventId);
             data.payload[`player${idx}solveRank`] = result.ranking;
@@ -82,6 +101,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
                 data.payload[`player${idx}solve${i}`] = formatAttemptResult(attempt.result, eventId);
             })
         }
+        
     });
 
     var myHeaders = new Headers();
@@ -234,6 +254,7 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
         //model
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}name`, "title": `Player ${idx} Name`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}country`, "title": `Player ${idx} Country`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}countryFlag`, "title": `Player ${idx} Country Flag`, "type": "image" });
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveAverage`, "title": `Player ${idx} Average`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveProjection`, "title": `Player ${idx} Projection`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveBest`, "title": `Player ${idx} Best`, "type": "text" });
@@ -246,6 +267,7 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
 
         data.payload[`player${idx}name`] = "";
         data.payload[`player${idx}country`] = "";
+        data.payload[`player${idx}countryFlag`] = "";
         data.payload[`player${idx}solveAverage`] = "";
         data.payload[`player${idx}solveBest`] = "";
         data.payload[`player${idx}solveRank`] = "";
@@ -266,6 +288,7 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
         if (playerResult !== null && playerResult !== undefined) {
             data.payload[`player${idx}name`] = formatName(playerResult.name);
             data.payload[`player${idx}country`] = playerResult.country;
+            data.payload[`player${idx}countryFlag`] = `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
             data.payload[`player${idx}solveAverage`] = playerResult.average;
             data.payload[`player${idx}solveBest`] = playerResult.best;
             data.payload[`player${idx}solveRank`] = idx + 1; //playerResult.ranking;
@@ -276,17 +299,6 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
                 data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });
                 data.payload[`player${idx}solve${i}`] = solve
             })
-            // if (round.format.numberOfAttempts === (playerResult.rawSolves.length + 1)) {
-            //     data.payload[`player${idx}BPA`] = formatAttemptResult(average(playerResult.rawSolves.concat(0.01), eventId), eventId);
-            //     data.payload[`player${idx}WPA`] = formatAttemptResult(average(playerResult.rawSolves.concat(-1), eventId), eventId);
-            // } else if (round.format.numberOfAttempts === playerResult.rawSolves.length) {
-            //     const allButLast = playerResult.rawSolves.slice(0, playerResult.rawSolves.length - 1)
-            //     data.payload[`player${idx}BPA`] = formatAttemptResult(average(allButLast.concat(0.01), eventId), eventId);
-            //     data.payload[`player${idx}WPA`] = formatAttemptResult(average(allButLast.concat(-1), eventId), eventId);
-            // } else {
-            //     data.payload[`player${idx}BPA`] = "--";
-            //     data.payload[`player${idx}WPA`] = "--";
-            // }
             data.payload[`player${idx}BPA`] = playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
             data.payload[`player${idx}WPA`] = playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
             data.payload[`player${idx}forAdvance`] = playerResult.forAdvance === 0 ? "--" : playerResult.forAdvance;
