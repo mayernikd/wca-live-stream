@@ -133,7 +133,7 @@ const RoundResultsTable = memo(
                     ...styles.ranking,
                   }}
                 >
-                  <StreamUser type={"single"} eventId={eventId} wcaId={result.person.wcaId}/>
+                  <StreamUser type={"single"} eventId={eventId} wcaId={result.person}/>
                 </TableCell>
                 <TableCell
                   align="right"
@@ -142,7 +142,7 @@ const RoundResultsTable = memo(
                     ...styles.ranking,
                   }}
                 >
-                  <StreamUser type={"average"} eventId={eventId} wcaId={result.person.wcaId}/>
+                  <StreamUser type={"average"} eventId={eventId} wcaId={result.person}/>
                 </TableCell>
                 <TableCell sx={{ ...styles.cell, ...styles.name }}>
                   {smScreen ? (
