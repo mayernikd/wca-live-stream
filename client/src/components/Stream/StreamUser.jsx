@@ -63,7 +63,8 @@ async function init(type, eventId, person) {
         },
         "payload": {
             "name": (json.name + ""),
-            "single": type === "single" ? single : average,
+            "single": single,
+            "average": average,
             "eventId": eventId,
             "countryFlag": `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${person.country.iso2.toLowerCase()}.svg`
 
