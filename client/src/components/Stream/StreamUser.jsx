@@ -34,7 +34,7 @@ function getTopFacts(data, currentEventId) {
     if (bestNat.rank < 21) {
         facts.push({
             score: boostIfCurrent(bestNat.eventId, 100 - bestNat.rank),
-            text: `Ranked ${ordinal(bestNat.rank)} nationally in ${bestNat.eventId.toUpperCase()} with a best single (${formatSeconds(bestNat.best)}).`,
+            text: `Ranked ${ordinal(bestNat.rank)} nationally in ${bestNat.eventId.toUpperCase()} with a best single (${formatSeconds(bestNat.best)})`,
         });
     }
 
@@ -48,7 +48,7 @@ function getTopFacts(data, currentEventId) {
     if (bestCont.rank < 51) {
         facts.push({
             score: boostIfCurrent(bestCont.eventId, 90 - bestCont.rank),
-            text: `Ranked ${ordinal(bestCont.rank)} in their continent for ${bestCont.eventId.toUpperCase()} with a best single (${formatSeconds(bestCont.best)}).`,
+            text: `Ranked ${ordinal(bestCont.rank)} in their continent for ${bestCont.eventId.toUpperCase()} with a best single (${formatSeconds(bestCont.best)})`,
         });
     }
 
@@ -56,14 +56,14 @@ function getTopFacts(data, currentEventId) {
     if (data.numberOfChampionships > 0) {
         facts.push({
             score: 30 + data.numberOfChampionships * 5,
-            text: `Participated in ${data.numberOfChampionships} championship events.`,
+            text: `Participated in ${data.numberOfChampionships} championship events`,
         });
     }
 
     // 4. Total competition participation
     facts.push({
         score: 20 + data.numberOfCompetitions / 2,
-        text: `Has competed in ${data.numberOfCompetitions} official competitions.`,
+        text: `Has competed in ${data.numberOfCompetitions} official competitions`,
     });
 
     // 5. Best average rank (national)
@@ -76,7 +76,7 @@ function getTopFacts(data, currentEventId) {
     if (bestAvgNat.rank < 21) {
         facts.push({
             score: boostIfCurrent(bestAvgNat.eventId, 85 - bestAvgNat.rank),
-            text: `Ranked ${ordinal(bestAvgNat.rank)} best national average in ${bestAvgNat.eventId.toUpperCase()} (${formatSeconds(bestAvgNat.best)}).`,
+            text: `Ranked ${ordinal(bestAvgNat.rank)} best national average in ${bestAvgNat.eventId.toUpperCase()} (${formatSeconds(bestAvgNat.best)})`,
         });
     }
 
@@ -90,7 +90,7 @@ function getTopFacts(data, currentEventId) {
         if (bronze) parts.push(`${bronze} bronze`);
         facts.push({
             score: 40 + gold * 5 + silver * 3 + bronze * 2,
-            text: `Won ${total} medals: ${parts.join(', ')}.`,
+            text: `Won ${total} medals: ${parts.join(', ')}`,
         });
     }
 
@@ -105,7 +105,7 @@ function getTopFacts(data, currentEventId) {
     if (mostEvent) {
         facts.push({
             score: boostIfCurrent(mostEvent, 10 + mostCount),
-            text: `Most frequently competed event: ${mostEvent.toUpperCase()} (${mostCount} times).`,
+            text: `Most frequently competed event: ${mostEvent.toUpperCase()} (${mostCount} times)`,
         });
     }
 
@@ -114,7 +114,7 @@ function getTopFacts(data, currentEventId) {
     if (topGlobal) {
         facts.push({
             score: boostIfCurrent(topGlobal.eventId, 100 - topGlobal.rank.world / 10),
-            text: `World ranked ${ordinal(topGlobal.rank.world)} in ${topGlobal.eventId.toUpperCase()} with single (${formatSeconds(topGlobal.best)}).`,
+            text: `World ranked ${ordinal(topGlobal.rank.world)} in ${topGlobal.eventId.toUpperCase()} with single (${formatSeconds(topGlobal.best)})`,
         });
     }
 
@@ -132,7 +132,7 @@ function getTopFacts(data, currentEventId) {
 
             records.push({
                 score: boostIfCurrent(eid, 200000),
-                text: `Holds a ${top.level} Record in ${eid.toUpperCase()} (${formatSeconds(r.best)}).`,
+                text: `Holds a ${top.level} Record in ${eid.toUpperCase()} (${formatSeconds(r.best)})`,
             });
         }
     }
