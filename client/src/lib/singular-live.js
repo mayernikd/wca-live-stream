@@ -65,6 +65,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveBest`, "title": `Player ${idx} Best`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveRank`, "title": `Player ${idx} Rank`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveAdvancing`, "title": `Player ${idx} Advancing`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveHighlightColor`, "title": `Player ${idx} Highlight Color`, "type": "color" });
         data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveCount`, "title": `Player ${idx} Solve Count`, "type": "text" });
 
         data.payload[`player${idx}name`] = "";
@@ -74,6 +75,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
         data.payload[`player${idx}solveBest`] = "";
         data.payload[`player${idx}solveRank`] = "";
         data.payload[`player${idx}solveAdvancing`] = "";
+        data.payload[`player${idx}solveHighlightColor`] = "#00000000";
         data.payload[`player${idx}solveCount`] = "";
         data.payload[`player${idx}solve0`] = "";
         data.payload[`player${idx}solve1`] = "";
@@ -95,6 +97,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
             data.payload[`player${idx}solveBest`] = formatAttemptResult(result.best, eventId);
             data.payload[`player${idx}solveRank`] = result.ranking;
             data.payload[`player${idx}solveAdvancing`] = result.advancing;
+            data.payload[`player${idx}solveHighlightColor`] = getHighlightColor(result, round);
             data.payload[`player${idx}solveCount`] = result.attempts.length;
             result.attempts.forEach((attempt, i) => {
                 data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });
@@ -120,7 +123,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
         .catch(error => console.log('error', error));
 }
 
-export async function UpdateStreamRoundProjections(round, rankRange) {
+export async function UpdateStreamRoundProjections(round, startNumber, numRecords) {
 
     const viewResults = resultsForView(round.results,
         round.competitionEvent.event.id,
@@ -215,12 +218,13 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
                 best: formatAttemptResult(result.best, eventId),
                 ranking: result.ranking,
                 advancing: result.advancing,
+                advancingColor: getHighlightColor(result, round),
                 solveCount: result.attempts.length,
                 solveProjection: formatAttemptResult(averageProjection(solves, round.format.sortBy, round.format.numberOfAttempts)),
                 BPA: result.bestPossibleAverage,
                 WPA: result.worstPossibleAverage,
                 forAdvance: result.forAdvance,
-                forFirst: result.forFirst 
+                forFirst: result.forFirst
             })
         }
     })
@@ -247,62 +251,63 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
 
     })
 
-    for (var idx = 0; idx < 8; idx++) {
-
-        const playerResult = playerResults[idx]
+    for (var idx = 0; idx < numRecords; idx++) {
+        const playerResult =  (idx + startNumber) < playerResults.length  ? playerResults[idx + startNumber] : null
 
         //model
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}name`, "title": `Player ${idx} Name`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}country`, "title": `Player ${idx} Country`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}countryFlag`, "title": `Player ${idx} Country Flag`, "type": "image" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveAverage`, "title": `Player ${idx} Average`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveProjection`, "title": `Player ${idx} Projection`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveBest`, "title": `Player ${idx} Best`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveRank`, "title": `Player ${idx} Rank`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveAdvancing`, "title": `Player ${idx} Advancing`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}solveCount`, "title": `Player ${idx} Solve Count`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}BPA`, "title": `Player ${idx} BPA`, "type": "text" });
-        data.model.fields.push({ "defaultValue": "", "id": `player${idx}WPA`, "title": `Player ${idx} WPA`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}name`, "title": `Player ${idx} Name`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}flag`, "title": `Player ${idx} Country Flag`, "type": "image" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}avg`, "title": `Player ${idx} Average`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}proj`, "title": `Player ${idx} Projection`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}best`, "title": `Player ${idx} Best`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}rank`, "title": `Player ${idx} Rank`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}adv`, "title": `Player ${idx} Advancing`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}color`, "title": `Player ${idx} Advancing Highlight Color`, "type": "color" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}count`, "title": `Player ${idx} Solve Count`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}bpa`, "title": `Player ${idx} BPA`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}wpa`, "title": `Player ${idx} WPA`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}forA`, "title": `Player ${idx} for Advance`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}for1`, "title": `Player ${idx} for First`, "type": "text" });
 
 
-        data.payload[`player${idx}name`] = "";
-        data.payload[`player${idx}country`] = "";
-        data.payload[`player${idx}countryFlag`] = "";
-        data.payload[`player${idx}solveAverage`] = "";
-        data.payload[`player${idx}solveBest`] = "";
-        data.payload[`player${idx}solveRank`] = "";
-        data.payload[`player${idx}solveAdvancing`] = "";
-        data.payload[`player${idx}solveCount`] = 0;
-        data.payload[`player${idx}solveProjection`] = "";
-        data.payload[`player${idx}BPA`] = "";
-        data.payload[`player${idx}WPA`] = "";
-        data.payload[`player${idx}forAdvance`] = "";
-        data.payload[`player${idx}forFirst`] = "";
+        data.payload[`p${idx}name`] = "";
+        data.payload[`p${idx}flag`] = "";
+        data.payload[`p${idx}avg`] = "";
+        data.payload[`p${idx}best`] = "";
+        data.payload[`p${idx}rank`] = "";
+        data.payload[`p${idx}adv`] = "";
+        data.payload[`p${idx}color`] = "#00000000";
+        data.payload[`p${idx}count`] = "";
+        data.payload[`p${idx}proj`] = "";
+        data.payload[`p${idx}bpa`] = "";
+        data.payload[`p${idx}wpa`] = "";
+        data.payload[`p${idx}forA`] = "";
+        data.payload[`p${idx}for1`] = "";
 
-        for (var i = 0; i < round.format.numberOfAttempts; i++) {
-            data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });
-            data.payload[`player${idx}solve${i}`] = "";
-        }
+        // for (var i = 0; i < round.format.numberOfAttempts; i++) {
+        //     data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });
+        //     data.payload[`p${idx}solve${i}`] = "";
+        // }
 
         //payload
         if (playerResult !== null && playerResult !== undefined) {
-            data.payload[`player${idx}name`] = formatName(playerResult.name);
-            data.payload[`player${idx}country`] = playerResult.country;
-            data.payload[`player${idx}countryFlag`] = `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
-            data.payload[`player${idx}solveAverage`] = playerResult.average;
-            data.payload[`player${idx}solveBest`] = playerResult.best;
-            data.payload[`player${idx}solveRank`] = idx + 1; //playerResult.ranking;
-            data.payload[`player${idx}solveAdvancing`] = playerResult.advancing;
-            data.payload[`player${idx}solveCount`] = playerResult.solveCount;
-            data.payload[`player${idx}solveProjection`] = round.format.numberOfAttempts !== playerResult.solveCount ? getSolvesRemaining(playerResult.solveCount, round.format.numberOfAttempts) + playerResult.solveProjection : round.format.sortBy === "average" ? playerResult.average : playerResult.solveProjection;
-            playerResult.solves.forEach((solve, i) => {
-                data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });
-                data.payload[`player${idx}solve${i}`] = solve
-            })
-            data.payload[`player${idx}BPA`] = playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
-            data.payload[`player${idx}WPA`] = playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
-            data.payload[`player${idx}forAdvance`] = playerResult.forAdvance === 0 ? "--" : playerResult.forAdvance;
-            data.payload[`player${idx}forFirst`] = playerResult.forFirst === 0 ? "--" : playerResult.forFirst;
+            data.payload[`p${idx}name`] = formatName(playerResult.name);
+            data.payload[`p${idx}flag`] = `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
+            data.payload[`p${idx}avg`] = playerResult.average;
+            data.payload[`p${idx}best`] = playerResult.best;
+            data.payload[`p${idx}rank`] = idx + 1 + startNumber; //playerResult.ranking;
+            data.payload[`p${idx}adv`] = playerResult.advancing;
+            data.payload[`p${idx}color`] = playerResult.advancingColor;
+            data.payload[`p${idx}count`] = playerResult.solveCount + "/" + round.format.numberOfAttempts;
+            data.payload[`p${idx}proj`] = round.format.numberOfAttempts !== playerResult.solveCount ? getSolvesRemaining(playerResult.solveCount, round.format.numberOfAttempts) + playerResult.solveProjection : round.format.sortBy === "average" ? playerResult.average : playerResult.solveProjection;
+            // playerResult.solves.forEach((solve, i) => {
+            //     data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });
+            //     data.payload[`player${idx}solve${i}`] = solve
+            // })
+            data.payload[`p${idx}bpa`] = playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
+            data.payload[`p${idx}wpa`] = playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
+            data.payload[`p${idx}forA`] = playerResult.forAdvance === 0 ? "--" : playerResult.forAdvance;
+            data.payload[`p${idx}for1`] = playerResult.forFirst === 0 ? "--" : playerResult.forFirst;
         }
 
     }
@@ -762,4 +767,43 @@ function worstAverage(results) {
     values.sort((a, b) => b - a);
     return (values.slice(0, 3).reduce((sum, current) => sum + current, 0)) / 3;
 
+}
+
+function getHighlightColor(result, round){
+    // check if finals -- so advancementCondition === null
+    const isFinals = (round.advancementCondition === null);
+    const isFinished = round.finished;
+
+    if(result.advancing){
+        if(isFinals){
+            if(isFinished){
+                switch(result.ranking){
+                    case 1:
+                        return "#EFBF04";
+                    case 2:
+                        return "#C4C4C4";
+                    case 3: 
+                        return "#CE8946";
+                    default:
+                        break;
+                }
+            } else {
+                switch(result.ranking){
+                    case 1:
+                        return "#EFBF04CC";
+                    case 2:
+                        return "#C4C4C4CC";
+                    case 3: 
+                        return "#CE8946CC";
+                    default:
+                        if(result.advancingQuestionable) return "#800000CC";
+                }
+            }
+        } else {
+            if(isFinished && result.advancing) return "#800000"; 
+            if(!isFinished && result.advancingQuestionable) return "#800000CC"; 
+        }
+    }
+
+    return "#00000000";
 }
