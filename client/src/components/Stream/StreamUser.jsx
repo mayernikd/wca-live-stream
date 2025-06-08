@@ -4,151 +4,278 @@ import StreamIcon from '@mui/icons-material/Stream';
 import { average, formatAttemptResult } from '../../lib/attempt-result';
 import { getEventName } from '../../lib/event-utils';
 
-function getTopFacts(data, currentEventId) {
-    const facts = [];
+function getTopFacts(data, years, currentEventId) {
+  const facts = [];
 
-    const ordinal = (n) => {
-        const s = ["th", "st", "nd", "rd"];
-        const v = n % 100;
-        return n + (s[(v - 20) % 10] || s[v] || s[0]);
-    };
+  const ordinal = (n) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
 
-    const getTopPlacement = (rank) => {
-        if (!rank) return null;
-        if (rank.world === 1) return { level: "World", rank: rank.world };
-        if (rank.continent === 1) return { level: "Continent", rank: rank.continent };
-        if (rank.country === 1) return { level: "National", rank: rank.country };
-        return null;
-    };
+  const formatWorldRankingText = (rank, type, eid, best) => {
+    if (rank === 1) return `World Record ${type} in ${eid.toUpperCase()} (${formatSeconds(best)})`;
+    if (rank === 2) return `2nd fastest ${type} in the world in ${eid.toUpperCase()} (${formatSeconds(best)})`;
+    if (rank === 3) return `3rd fastest ${type} in the world in ${eid.toUpperCase()} (${formatSeconds(best)})`;
+    return `Ranked ${ordinal(rank)} in the world in ${eid.toUpperCase()} (${formatSeconds(best)})`;
+  };
 
-    const boostIfCurrent = (eventId, baseScore) =>
-        eventId === currentEventId ? baseScore + 1000 : baseScore;
+  // 1. Record or ranking for SINGLE
+  const single = (data.rank.singles || []).find((r) => r.eventId === currentEventId);
+  if (single) {
+    const r = single;
+    const eid = r.eventId;
+    const best = r.best;
+    const rank = r.rank;
 
-    // 1. Best national rank (singles)
-    let bestNat = { rank: Infinity, eventId: '', best: null };
-    for (const r of data.rank.singles || []) {
-        if (r.rank?.country < bestNat.rank) {
-            bestNat = { rank: r.rank.country, eventId: r.eventId, best: r.best };
-        }
-    }
-    if (bestNat.rank < 21) {
+    if (rank.world === 1 || rank.continent === 1 || rank.country === 1) {
+      if (rank.world === 1) {
         facts.push({
-            score: boostIfCurrent(bestNat.eventId, 100 - bestNat.rank),
-            text: `Ranked ${ordinal(bestNat.rank)} nationally in ${bestNat.eventId.toUpperCase()} with a best single (${formatSeconds(bestNat.best)})`,
+          score: 200000,
+          text: formatWorldRankingText(1, "single", eid, best),
         });
-    }
-
-    // 2. Best continental rank (singles)
-    let bestCont = { rank: Infinity, eventId: '', best: null };
-    for (const r of data.rank.singles || []) {
-        if (r.rank?.continent < bestCont.rank) {
-            bestCont = { rank: r.rank.continent, eventId: r.eventId, best: r.best };
-        }
-    }
-    if (bestCont.rank < 51) {
+      } else if (rank.continent === 1) {
         facts.push({
-            score: boostIfCurrent(bestCont.eventId, 90 - bestCont.rank),
-            text: `Ranked ${ordinal(bestCont.rank)} in their continent for ${bestCont.eventId.toUpperCase()} with a best single (${formatSeconds(bestCont.best)})`,
+          score: 180000,
+          text: `Continental Record single in ${eid.toUpperCase()} (${formatSeconds(best)})`,
         });
-    }
-
-    // 3. Championship participation
-    if (data.numberOfChampionships > 0) {
+      } else {
         facts.push({
-            score: 30 + data.numberOfChampionships * 5,
-            text: `Participated in ${data.numberOfChampionships} championship events`,
+          score: 160000,
+          text: `National Record single in ${eid.toUpperCase()} (${formatSeconds(best)})`,
         });
+      }
+    } else {
+      if (rank.country < 21) {
+        facts.push({
+          score: 99 - rank.country,
+          text: `Ranked ${ordinal(rank.country)} nationally in ${eid.toUpperCase()} single (${formatSeconds(best)})`,
+        });
+      }
+      if (rank.continent < 51) {
+        facts.push({
+          score: 100 - rank.continent,
+          text: `Ranked ${ordinal(rank.continent)} in their continent for ${eid.toUpperCase()} single (${formatSeconds(best)})`,
+        });
+      }
+      if (rank.world < 101) {
+        facts.push({
+          score: 101 - rank.world / 2,
+          text: formatWorldRankingText(rank.world, "single", eid, best),
+        });
+      }
     }
+  }
 
-    // 4. Total competition participation
+  // 2. Record or ranking for AVERAGE
+  const average = (data.rank.averages || []).find((r) => r.eventId === currentEventId);
+  if (average) {
+    const r = average;
+    const eid = r.eventId;
+    const best = r.best;
+    const rank = r.rank;
+
+    if (rank.world === 1 || rank.continent === 1 || rank.country === 1) {
+      if (rank.world === 1) {
+        facts.push({
+          score: 200000,
+          text: formatWorldRankingText(1, "average", eid, best),
+        });
+      } else if (rank.continent === 1) {
+        facts.push({
+          score: 180000,
+          text: `Continental Record average in ${eid.toUpperCase()} (${formatSeconds(best)})`,
+        });
+      } else {
+        facts.push({
+          score: 160000,
+          text: `National Record average in ${eid.toUpperCase()} (${formatSeconds(best)})`,
+        });
+      }
+    } else {
+      if (rank.country < 21) {
+        facts.push({
+          score: 85 - rank.country,
+          text: `Ranked ${ordinal(rank.country)} nationally in ${eid.toUpperCase()} average (${formatSeconds(best)})`,
+        });
+      }
+      if (rank.continent < 51) {
+        facts.push({
+          score: 80 - rank.continent,
+          text: `Ranked ${ordinal(rank.continent)} in their continent for ${eid.toUpperCase()} average (${formatSeconds(best)})`,
+        });
+      }
+      if (rank.world < 101) {
+        facts.push({
+          score: 75 - rank.world / 2,
+          text: formatWorldRankingText(rank.world, "average", eid, best),
+        });
+      }
+    }
+  }
+
+  // 3. Championship participation
+  if (data.numberOfChampionships > 3) {
     facts.push({
-        score: 20 + data.numberOfCompetitions / 2,
-        text: `Has competed in ${data.numberOfCompetitions} official competitions`,
+      score: 30,
+      text: `Participated in ${data.numberOfChampionships} official championship competitions`,
     });
+  }
 
-    // 5. Best average rank (national)
-    let bestAvgNat = { rank: Infinity, eventId: '', best: null };
-    for (const r of data.rank.averages || []) {
-        if (r.rank?.country < bestAvgNat.rank) {
-            bestAvgNat = { rank: r.rank.country, eventId: r.eventId, best: r.best };
-        }
+  // 4. Total competition participation
+  facts.push({
+    score: 20,
+    text: `Participated in ${data.numberOfCompetitions} official competitions`,
+  });
+
+  // 5. Medals
+  const { gold = 0, silver = 0, bronze = 0 } = data.medals || {};
+  const total = gold + silver + bronze;
+  if (total > 0) {
+    facts.push({
+      score: 40,
+      text: `Medals: ${gold} Gold, ${silver} Silver, ${bronze} Bronze`,
+    });
+  }
+
+  // 6. Most participated event
+  const eventFreq = {};
+  for (const comp of Object.values(data.results || {})) {
+    for (const eventId of Object.keys(comp)) {
+      eventFreq[eventId] = (eventFreq[eventId] || 0) + 1;
     }
-    if (bestAvgNat.rank < 21) {
+  }
+  const [mostEvent, mostCount] = Object.entries(eventFreq).sort((a, b) => b[1] - a[1])[0] || [];
+  if (mostEvent) {
+    facts.push({
+      score: 10,
+      text: `Most frequently competed event: ${mostEvent.toUpperCase()} (${mostCount} times)`,
+    });
+  }
+
+  // 7. Experience milestone (based on WCA ID)
+const getStartYearFromWcaId = (wcaId) => {
+  const match = wcaId?.match(/^(\d{4})/);
+  return match ? parseInt(match[1], 10) : null;
+};
+
+const startYear = getStartYearFromWcaId(data.id);
+const currentYear = new Date().getFullYear();
+
+if (startYear && startYear <= currentYear) {
+  const years = currentYear - startYear;
+
+  if (years >= 10) {
+    facts.push({
+      score: 15+ years, // high enough to often beat medals
+      text: `Has been competing officially for over ${years} years`,
+    });
+  } else if (years > 0 && years % 5 === 0) {
+    facts.push({
+      score: 15 + years,
+      text: `Celebrating ${years} years of official competition this year`,
+    });
+  }
+}
+
+  if (startYear && startYear <= currentYear) {
+  facts.push({
+    score: 5, // very low priority
+    text: `Started competing officially in ${startYear}`,
+  });
+}
+
+const thisYear = new Date(Date.now()).getFullYear();
+
+if (Array.isArray(years) && currentEventId) {
+  const history = years.filter(y => y.average && !isNaN(parseTimeToSeconds(y.average)));
+  const sorted = [...history].sort((a, b) => parseInt(a.year) - parseInt(b.year));
+
+  // 1. Best yearly average
+  const best = sorted.reduce((acc, y) => {
+    const avg = parseTimeToSeconds(y.average);
+    return (avg < acc.value && avg > 0) ? { year: y.year, value: avg } : acc;
+  }, { year: null, value: Infinity });
+
+  if (best.year) {
+    if(best.year != thisYear){
         facts.push({
-            score: boostIfCurrent(bestAvgNat.eventId, 85 - bestAvgNat.rank),
-            text: `Ranked ${ordinal(bestAvgNat.rank)} best national average in ${bestAvgNat.eventId.toUpperCase()} (${formatSeconds(bestAvgNat.best)})`,
+        score: 35,
+        text: `Best yearly average was ${best.year} (${formatSeconds(best.value * 100)})`,
         });
-    }
-
-    // 6. Medals
-    const { gold = 0, silver = 0, bronze = 0 } = data.medals || {};
-    const total = gold + silver + bronze;
-    if (total > 0) {
-        const parts = [];
-        if (gold) parts.push(`${gold} gold`);
-        if (silver) parts.push(`${silver} silver`);
-        if (bronze) parts.push(`${bronze} bronze`);
+    } else {
         facts.push({
-            score: 40 + gold * 5 + silver * 3 + bronze * 2,
-            text: `Won ${total} medals: ${parts.join(', ')}`,
-        });
+        score: 35,
+        text: `On pace for best yearly average in ${best.year} (${formatSeconds(best.value * 100)})`,
+    });
     }
+    
+  }
 
-    // 7. Most participated event
-    const eventFreq = {};
-    for (const comp of Object.values(data.results || {})) {
-        for (const eventId of Object.keys(comp)) {
-            eventFreq[eventId] = (eventFreq[eventId] || 0) + 1;
-        }
+  // 2. Long-term improvement
+  if (sorted.length >= 2) {
+    const first = parseTimeToSeconds(sorted[0].average);
+    const last = parseTimeToSeconds(sorted[sorted.length - 1].average);
+    if (last < first && (last / first) < .9) {
+      const diff = (first - last).toFixed(2);
+      facts.push({
+        score: 34,
+        text: `Improved average by ${formatSeconds(diff * 100)} from ${sorted[0].year} to ${sorted[sorted.length - 1].year}`,
+      });
     }
-    const [mostEvent, mostCount] = Object.entries(eventFreq).sort((a, b) => b[1] - a[1])[0] || [];
-    if (mostEvent) {
-        facts.push({
-            score: boostIfCurrent(mostEvent, 10 + mostCount),
-            text: `Most frequently competed event: ${mostEvent.toUpperCase()} (${mostCount} times)`,
-        });
+  }
+
+  // 3. Consecutive improvement streak
+  const streak = sorted.every((val, i, arr) => i === 0 || parseTimeToSeconds(val.average) < parseTimeToSeconds(arr[i - 1].average));
+  if (streak && sorted.length >= 3) {
+    facts.push({
+      score: 32,
+      text: `Improved every year since ${sorted[0].year}`,
+    });
+  }
+
+  // 4. Finals and Champs averages
+  for (const y of years) {
+    if (y.averageFinals && !isNaN(parseTimeToSeconds(y.averageFinals))) {
+      facts.push({
+        score: 30,
+        text: `Final round average in ${y.year}: ${y.averageFinals}`,
+      });
     }
-
-    // 8. Global top 1000 rank
-    const topGlobal = (data.rank.singles || []).find((e) => e.rank?.world <= 101);
-    if (topGlobal) {
-        facts.push({
-            score: boostIfCurrent(topGlobal.eventId, 100 - topGlobal.rank.world / 10),
-            text: `World ranked ${ordinal(topGlobal.rank.world)} in ${topGlobal.eventId.toUpperCase()} with single (${formatSeconds(topGlobal.best)})`,
-        });
+    if (y.averageChamps && !isNaN(parseTimeToSeconds(y.averageChamps))) {
+      facts.push({
+        score: 30,
+        text: `Championship average in ${y.year}: ${y.averageChamps}`,
+      });
     }
-
-    // 9. Record (WR, CR, NR) – one per event
-    const seenEvents = new Set();
-    const records = [];
-
-    for (const r of [...(data.rank.singles || []), ...(data.rank.averages || [])]) {
-        const eid = r.eventId;
-        if (seenEvents.has(eid)) continue;
-
-        const top = getTopPlacement(r.rank);
-        if (top) {
-            seenEvents.add(eid);
-
-            records.push({
-                score: boostIfCurrent(eid, 200000),
-                text: `Holds a ${top.level} Record in ${eid.toUpperCase()} (${formatSeconds(r.best)})`,
-            });
-        }
-    }
-    facts.push(...records);
-    // Final sort and top 3
-    return facts.sort((a, b) => b.score - a.score).slice(0, 3).map(f => f.text);
+  }
 }
 
 
+  facts.sort((a, b) => b.score - a.score);
 
+  facts.push({score: 0, text: "--"});
+  facts.push({score: 0, text: "--"});
+
+  return facts.slice(0, 3).map((f) => f.text);
+}
+
+function parseTimeToSeconds(t) {
+  if (typeof t !== "string") return NaN;
+  const parts = t.split(":");
+  if (parts.length === 1) return parseFloat(parts[0]); // "3.05"
+  if (parts.length === 2) {
+    const [min, sec] = parts;
+    return parseInt(min, 10) * 60 + parseFloat(sec);
+  }
+  return NaN;
+}
 
 function getBest(arr) {
     if (arr !== undefined && arr !== null && arr.length > 0) {
         return formatSeconds(arr[0].best);
     }
-    return "";
+    return "--";
 }
 
 function getRankText(arr) {
@@ -172,7 +299,7 @@ function calculateAverageOfAverages(results) {
     for (const event in results) {
         if (results.hasOwnProperty(event)) {
             results[event].forEach(detail => {
-                if (detail.average) {
+                if (detail.average && detail.average > 0 ) {
                     totalAverage += detail.average;
                     count++;
                 }
@@ -180,7 +307,7 @@ function calculateAverageOfAverages(results) {
         }
     }
 
-    return count === 0 ? 0 : totalAverage / count;
+    return count < 3 ? 0 : totalAverage / count;
 }
 
 function calculateOverallAverageForChampionships(championshipIds, results) {
@@ -200,7 +327,7 @@ function calculateOverallAverageForChampionships(championshipIds, results) {
         }
     });
 
-    return count === 0 ? 0 : totalAverage / count;
+    return count < 3 ? 0 : totalAverage / count;
 }
 
 function getYearlyAverages(data, year, eventId) {
@@ -242,7 +369,7 @@ function calculateOverallAverageForChampionshipFinalRounds(championshipIds, resu
         for (const event in results) {
             if (results.hasOwnProperty(event) && event.includes(championship)) {
                 results[event].forEach(detail => {
-                    if (detail.average && detail.round === "Final" && (detail.position === 1 || detail.position === 2 || detail.position === 3)) {
+                    if (detail.average && detail.average > 0 && detail.round === "Final" && (detail.position === 1 || detail.position === 2 || detail.position === 3)) {
                         totalAverage += detail.average;
                         count++;
                     }
@@ -297,7 +424,15 @@ async function init(eventId, person) {
         average = `${getEventName(eventId)} PR Average: ${formatAttemptResult(avgObj.best, eventId)}`
     }
 
-    const facts = getTopFacts(playerData, eventId);
+    const years = [getYearlyAverages(playerData, "2025", eventId),
+            getYearlyAverages(playerData, "2024", eventId),
+            getYearlyAverages(playerData, "2023", eventId),
+            getYearlyAverages(playerData, "2022", eventId),
+            getYearlyAverages(playerData, "2021", eventId),
+            getYearlyAverages(playerData, "2020", eventId),
+            getYearlyAverages(playerData, "2019", eventId)]
+    
+    const facts = getTopFacts(playerData, years, eventId);
 
 
     const playerStats = {
@@ -314,11 +449,7 @@ async function init(eventId, person) {
         fact1: facts[0],
         fact2: facts[1],
         fact3: facts[2],
-        years: [
-            getYearlyAverages(playerData, "2025", eventId),
-            getYearlyAverages(playerData, "2024", eventId),
-            getYearlyAverages(playerData, "2023", eventId)
-        ]
+        years: years
     }
 
 
