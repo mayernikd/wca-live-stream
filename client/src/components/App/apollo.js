@@ -36,8 +36,8 @@ const httpLink = import.meta.env.PROD
 // Create a standard Phoenix websocket connection.
 const phoenixSocket = new PhoenixSocket(
   import.meta.env.PROD
-    ? `wss://${window.location.host}/socket`
-    : "ws://localhost:4000/socket",
+    ? `wss://live.worldcubeassociation.org/socket`
+    : "wss://live.worldcubeassociation.org/socket",
 );
 
 // Wrap the Phoenix socket in an AbsintheSocket.

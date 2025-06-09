@@ -1,9 +1,7 @@
-import React from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Box, IconButton, Toolbar, Tooltip, Typography } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import MenuIcon from '@mui/icons-material/Menu';
-import StreamCompetition from '../Stream/StreamCompetition';
 
 function CompetitionToolbar({ competition, onMenuClick }) {
   const location = useLocation();
@@ -40,7 +38,6 @@ function CompetitionToolbar({ competition, onMenuClick }) {
         {competition.shortName}
       </Typography>
       <Box sx={{ flexGrow: 1 }} />
-      <StreamCompetition competition={competition}/>
       {competition.access.canScoretake && (
         <Tooltip title="Admin view">
           <IconButton

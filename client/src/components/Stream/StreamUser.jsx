@@ -14,10 +14,10 @@ function getTopFacts(data, years, currentEventId) {
   };
 
   const formatWorldRankingText = (rank, type, eid, best) => {
-    if (rank === 1) return `World Record ${type} in ${eid.toUpperCase()} (${formatSeconds(best)})`;
-    if (rank === 2) return `2nd fastest ${type} in the world in ${eid.toUpperCase()} (${formatSeconds(best)})`;
-    if (rank === 3) return `3rd fastest ${type} in the world in ${eid.toUpperCase()} (${formatSeconds(best)})`;
-    return `Ranked ${ordinal(rank)} in the world in ${eid.toUpperCase()} (${formatSeconds(best)})`;
+    if (rank === 1) return `World Record ${type} in ${getEventName(eid)} (${formatSeconds(best)})`;
+    if (rank === 2) return `2nd fastest ${type} in the world in ${getEventName(eid)} (${formatSeconds(best)})`;
+    if (rank === 3) return `3rd fastest ${type} in the world in ${getEventName(eid)} (${formatSeconds(best)})`;
+    return `Ranked ${ordinal(rank)} in the world in ${getEventName(eid)} (${formatSeconds(best)})`;
   };
 
   // 1. Record or ranking for SINGLE
@@ -37,25 +37,25 @@ function getTopFacts(data, years, currentEventId) {
       } else if (rank.continent === 1) {
         facts.push({
           score: 180000,
-          text: `Continental Record single in ${eid.toUpperCase()} (${formatSeconds(best)})`,
+          text: `Continental Record single in ${getEventName(eid)} (${formatSeconds(best)})`,
         });
       } else {
         facts.push({
           score: 160000,
-          text: `National Record single in ${eid.toUpperCase()} (${formatSeconds(best)})`,
+          text: `National Record single in ${getEventName(eid)} (${formatSeconds(best)})`,
         });
       }
     } else {
       if (rank.country < 21) {
         facts.push({
           score: 99 - rank.country,
-          text: `Ranked ${ordinal(rank.country)} nationally in ${eid.toUpperCase()} single (${formatSeconds(best)})`,
+          text: `Ranked ${ordinal(rank.country)} nationally in ${getEventName(eid)} single (${formatSeconds(best)})`,
         });
       }
       if (rank.continent < 51) {
         facts.push({
           score: 100 - rank.continent,
-          text: `Ranked ${ordinal(rank.continent)} in their continent for ${eid.toUpperCase()} single (${formatSeconds(best)})`,
+          text: `Ranked ${ordinal(rank.continent)} in their continent for ${getEventName(eid)} single (${formatSeconds(best)})`,
         });
       }
       if (rank.world < 101) {
@@ -84,25 +84,25 @@ function getTopFacts(data, years, currentEventId) {
       } else if (rank.continent === 1) {
         facts.push({
           score: 180000,
-          text: `Continental Record average in ${eid.toUpperCase()} (${formatSeconds(best)})`,
+          text: `Continental Record average in ${getEventName(eid)} (${formatSeconds(best)})`,
         });
       } else {
         facts.push({
           score: 160000,
-          text: `National Record average in ${eid.toUpperCase()} (${formatSeconds(best)})`,
+          text: `National Record average in ${getEventName(eid)} (${formatSeconds(best)})`,
         });
       }
     } else {
       if (rank.country < 21) {
         facts.push({
           score: 85 - rank.country,
-          text: `Ranked ${ordinal(rank.country)} nationally in ${eid.toUpperCase()} average (${formatSeconds(best)})`,
+          text: `Ranked ${ordinal(rank.country)} nationally in ${getEventName(eid)} average (${formatSeconds(best)})`,
         });
       }
       if (rank.continent < 51) {
         facts.push({
           score: 80 - rank.continent,
-          text: `Ranked ${ordinal(rank.continent)} in their continent for ${eid.toUpperCase()} average (${formatSeconds(best)})`,
+          text: `Ranked ${ordinal(rank.continent)} in their continent for ${getEventName(eid)} average (${formatSeconds(best)})`,
         });
       }
       if (rank.world < 101) {
@@ -146,10 +146,10 @@ function getTopFacts(data, years, currentEventId) {
     }
   }
   const [mostEvent, mostCount] = Object.entries(eventFreq).sort((a, b) => b[1] - a[1])[0] || [];
-  if (mostEvent) {
+  if (mostEvent && mostCount > 1) {
     facts.push({
       score: 10,
-      text: `Most frequently competed event: ${mostEvent.toUpperCase()} (${mostCount} times)`,
+      text: `Most frequently competed event: ${getEventName(mostEvent)} (${mostCount} times)`,
     });
   }
 
@@ -201,12 +201,12 @@ if (Array.isArray(years) && currentEventId) {
     if(best.year != thisYear){
         facts.push({
         score: 35,
-        text: `Best yearly average was ${best.year} (${formatSeconds(best.value * 100)})`,
+        text: `Best yearly average for ${getEventName(currentEventId)} was ${best.year} (${formatSeconds(best.value * 100)})`,
         });
     } else {
         facts.push({
         score: 35,
-        text: `On pace for best yearly average in ${best.year} (${formatSeconds(best.value * 100)})`,
+        text: `On pace for best yearly average for ${getEventName(currentEventId)} in ${best.year} (${formatSeconds(best.value * 100)})`,
     });
     }
     
@@ -220,7 +220,7 @@ if (Array.isArray(years) && currentEventId) {
       const diff = (first - last).toFixed(2);
       facts.push({
         score: 34,
-        text: `Improved average by ${formatSeconds(diff * 100)} from ${sorted[0].year} to ${sorted[sorted.length - 1].year}`,
+        text: `Improved average for ${getEventName(currentEventId)} by ${formatSeconds(diff * 100)} from ${sorted[0].year} to ${sorted[sorted.length - 1].year}`,
       });
     }
   }

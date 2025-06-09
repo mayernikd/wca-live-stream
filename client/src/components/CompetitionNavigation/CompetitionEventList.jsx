@@ -31,7 +31,7 @@ function CompetitionEventList({ competitionEvents, competitionId }) {
             onClick={(event) =>
               handleCompetitionEventClick(event, competitionEvent)
             }
-            disabled={!competitionEvent.rounds.some((round) => round.open)}
+            //disabled={!competitionEvent.rounds.some((round) => round.open)}
           >
             <ListItemIcon>
               <CubingIcon eventId={competitionEvent.event.id} />
@@ -56,7 +56,7 @@ function CompetitionEventList({ competitionEvents, competitionId }) {
                   key={round.id}
                   component={RouterLink}
                   to={`/competitions/${competitionId}/rounds/${round.id}`}
-                  disabled={!round.open}
+                  //disabled={!round.open}
                 >
                   <ListItemText primary={round.name} />
                   {round.label && (
