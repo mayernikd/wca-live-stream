@@ -1,4 +1,3 @@
-import React from 'react';
 import { IconButton, Tooltip } from '@mui/material';
 import StreamIcon from '@mui/icons-material/Stream';
 import { parseActivityCode } from "../../lib/activity-code";

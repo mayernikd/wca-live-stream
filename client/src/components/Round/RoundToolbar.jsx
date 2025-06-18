@@ -11,7 +11,6 @@ import PrintIcon from "@mui/icons-material/Print";
 import InsightsIcon from "@mui/icons-material/Insights";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { appUrl } from "../../lib/urls";
-import { forecastViewSupported } from "../../lib/result";
 import StreamEvent from "../Stream/StreamEvent";
 
 function RoundToolbar({ round, competitionId, forecastView, setForecastView }) {
@@ -79,8 +78,8 @@ function RoundToolbar({ round, competitionId, forecastView, setForecastView }) {
           </Tooltip>
         </Grid>
       )}
-      <StreamEvent round={round} projections={true}/>
-      <StreamEvent round={round} projections={false}/>
+      <StreamEvent roundId={round.id} projections={true}/>
+      <StreamEvent roundId={round.id} projections={false}/>
     </Grid>
   );
 }

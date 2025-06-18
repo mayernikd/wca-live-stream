@@ -1,5 +1,4 @@
-import { formatAttemptResult, worstPossibleAverage } from './attempt-result';
-import { average } from './attempt-result';
+import { formatAttemptResult } from './attempt-result';
 import { resultsForView } from './result';
 
 export async function UpdateStreamRoundResults(round, rankRange) {
@@ -178,6 +177,12 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
                     "id": "roundFormat",
                     "title": "Round Format",
                     "type": "text"
+                },
+                {
+                    "defaultValue": "ADV",
+                    "id": "roundAdvance",
+                    "title": "Round Advance",
+                    "type": "text"
                 }
             ]
         },
@@ -188,7 +193,8 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             "eventId": round.competitionEvent.event.id,
             "roundName": round.name,
             "roundId": round.id,
-            "roundFormat": round.format.sortBy
+            "roundFormat": round.format.sortBy,
+            "roundAdvance": (round.advancementCondition === null) ? "3RD" : "ADV"
         }
     }
 
@@ -199,7 +205,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         const solves = []
         playerResult.rawSolves = []
         playerResult.solves = []
-        result.attempts.forEach((attempt, i) => {
+        result.attempts.forEach((attempt) => {
             solves.push(attempt.result)
             playerResult.rawSolves.push(attempt.result)
             playerResult.solves.push(formatAttemptResult(attempt.result, eventId))
@@ -227,7 +233,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
                 forFirst: result.forFirst
             })
         }
-    })
+    });
 
     playerResults.sort((a, b) => {
         switch (round.format.sortBy) {
@@ -249,7 +255,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         }
 
 
-    })
+    });
 
     for (var idx = 0; idx < numRecords; idx++) {
         const playerResult =  (idx + startNumber) < playerResults.length  ? playerResults[idx + startNumber] : null
@@ -264,6 +270,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}adv`, "title": `Player ${idx} Advancing`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}color`, "title": `Player ${idx} Advancing Highlight Color`, "type": "color" });
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}count`, "title": `Player ${idx} Solve Count`, "type": "text" });
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}countColor`, "title": `Player ${idx} Solve Count Color`, "type": "color" });
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}bpa`, "title": `Player ${idx} BPA`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}wpa`, "title": `Player ${idx} WPA`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}forA`, "title": `Player ${idx} for Advance`, "type": "text" });
@@ -278,6 +285,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         data.payload[`p${idx}adv`] = "";
         data.payload[`p${idx}color`] = "#00000000";
         data.payload[`p${idx}count`] = "";
+        data.payload[`p${idx}countColor`] = "#00000000";
         data.payload[`p${idx}proj`] = "";
         data.payload[`p${idx}bpa`] = "";
         data.payload[`p${idx}wpa`] = "";
@@ -299,6 +307,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             data.payload[`p${idx}adv`] = playerResult.advancing;
             data.payload[`p${idx}color`] = playerResult.advancingColor;
             data.payload[`p${idx}count`] = playerResult.solveCount + "/" + round.format.numberOfAttempts;
+            data.payload[`p${idx}countColor`] = round.format.numberOfAttempts !== playerResult.solveCount ? "#cccccc" : "#FFFF00";
             data.payload[`p${idx}proj`] = round.format.numberOfAttempts !== playerResult.solveCount ? getSolvesRemaining(playerResult.solveCount, round.format.numberOfAttempts) + playerResult.solveProjection : round.format.sortBy === "average" ? playerResult.average : playerResult.solveProjection;
             // playerResult.solves.forEach((solve, i) => {
             //     data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Grid,
   Button,
@@ -30,7 +30,7 @@ function TimeBaseStations({ competitors, competitionId }) {
     <Grid container direction="column" alignItems="center" spacing={1}>
       <Grid container item xs={12}>
           {[5,7,25,19,2,10].map((index) => (
-            <Grid container item xs={12}>
+            <Grid key={"Players-" + index} container item xs={12}>
               <Grid container item xs={1}>
                 <Button
                     key={"Player1-" + index}

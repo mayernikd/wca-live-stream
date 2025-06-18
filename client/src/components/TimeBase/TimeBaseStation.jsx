@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GetTimeBaseStation } from '../../lib/singular-live';
 import {
   Button,
@@ -21,20 +21,17 @@ function TimeBaseStation({ competitionId, index, onData }) {
     const socket = new WebSocket(`wss://api.timebase.live/livestream/${competitionId}/${index}`);
   
   // Connection opened
-    socket.addEventListener("open", (event) => {
-      console.log("Hello - " + index);
+    socket.addEventListener("open", () => {
       setcolor("#00ff00")
       ping();
     });
   
-    socket.addEventListener("close", (event) => {
-      console.log("Closed - " + index);
+    socket.addEventListener("close", () => {
       setcolor("#ff0000")
     });
   
     // Listen for messages
     socket.addEventListener("message", (event) => {
-      console.log("Message from server - " + index, event.data);
       const data = JSON.parse(event.data);
       setResults(data)
       
@@ -90,7 +87,7 @@ useEffect(()=>{
           key={"Timebase" + index}
           button
           onClick={() => {
-            const data = GetTimeBaseStation(index, (ret) => {
+            GetTimeBaseStation(index, (ret) => {
               if(ret !== null){
                 setResults(JSON.parse(ret))
               }

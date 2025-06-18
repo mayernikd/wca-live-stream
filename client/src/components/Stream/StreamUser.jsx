@@ -46,24 +46,28 @@ function getTopFacts(data, years, currentEventId) {
         });
       }
     } else {
-      if (rank.country < 21) {
-        facts.push({
-          score: 99 - rank.country,
-          text: `Ranked ${ordinal(rank.country)} nationally in ${getEventName(eid)} single (${formatSeconds(best)})`,
-        });
-      }
-      if (rank.continent < 51) {
-        facts.push({
-          score: 100 - rank.continent,
-          text: `Ranked ${ordinal(rank.continent)} in their continent for ${getEventName(eid)} single (${formatSeconds(best)})`,
-        });
-      }
       if (rank.world < 101) {
         facts.push({
           score: 101 - rank.world / 2,
           text: formatWorldRankingText(rank.world, "single", eid, best),
         });
+      } else {
+        if (rank.continent < 51) {
+          facts.push({
+            score: 100 - rank.continent,
+            text: `Ranked ${ordinal(rank.continent)} in their continent for ${getEventName(eid)} single (${formatSeconds(best)})`,
+          });
+        } else {
+          if (rank.country < 21) {
+            facts.push({
+              score: 99 - rank.country,
+              text: `Ranked ${ordinal(rank.country)} nationally in ${getEventName(eid)} single (${formatSeconds(best)})`,
+            });
+          }
+        }
       }
+      
+      
     }
   }
 

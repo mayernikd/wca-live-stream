@@ -6,7 +6,7 @@ import useDebounce from "../../hooks/useDebounce";
 
 const COMPETITIONS = gql`
   query Competitions($filter: String!) {
-    competitions(filter: $filter, limit: 10) {
+    competitions(filter: $filter, limit: 100) {
       id
       name
     }
