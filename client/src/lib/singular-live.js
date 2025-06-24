@@ -1,5 +1,10 @@
 import { formatAttemptResult } from './attempt-result';
 import { resultsForView } from './result';
+import { getEventShortName } from "./event-utils";
+
+function getActivityTitle(eventName, roundName) {
+    return `${eventName} ${roundName}`;
+}
 
 export async function UpdateStreamRoundResults(round, rankRange) {
 
@@ -189,11 +194,11 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         "payload": {
             "competitionName": round.competitionEvent.competition.name,
             "competitionId": round.competitionEvent.competition.id,
-            "eventName": round.competitionEvent.event.name,
+            "eventName": getActivityTitle(getEventShortName(round.competitionEvent.event.id), round.name),
             "eventId": round.competitionEvent.event.id,
-            "roundName": round.name,
+            "roundName": getActivityTitle(round.competitionEvent.event.name, round.name),
             "roundId": round.id,
-            "roundFormat": round.format.sortBy,
+            "roundFormat": round.format.sortBy == "average" ? "AVG" : "BEST",
             "roundAdvance": (round.advancementCondition === null) ? "3RD" : "ADV"
         }
     }
@@ -220,7 +225,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
                 ...playerResult,
                 name: result.person.name,
                 country: result.person.country.iso2,
-                average: formatAttemptResult(result.average, eventId),
+                average: result.attempts.length == round.format.numberOfAttempts ? formatAttemptResult(result.average, eventId) : formatAttemptResult(result.projectedAverage, eventId),
                 best: formatAttemptResult(result.best, eventId),
                 ranking: result.ranking,
                 advancing: result.advancing,
@@ -261,6 +266,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         const playerResult =  (idx + startNumber) < playerResults.length  ? playerResults[idx + startNumber] : null
 
         //model
+        data.model.fields.push({ "defaultValue": "", "id": `p${idx}initial`, "title": `Player ${idx} Initial`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}name`, "title": `Player ${idx} Name`, "type": "text" });
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}flag`, "title": `Player ${idx} Country Flag`, "type": "image" });
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}avg`, "title": `Player ${idx} Average`, "type": "text" });
@@ -277,6 +283,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}for1`, "title": `Player ${idx} for First`, "type": "text" });
 
 
+        data.payload[`p${idx}initial`] = "";
         data.payload[`p${idx}name`] = "";
         data.payload[`p${idx}flag`] = "";
         data.payload[`p${idx}avg`] = "";
@@ -292,14 +299,11 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         data.payload[`p${idx}forA`] = "";
         data.payload[`p${idx}for1`] = "";
 
-        // for (var i = 0; i < round.format.numberOfAttempts; i++) {
-        //     data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });
-        //     data.payload[`p${idx}solve${i}`] = "";
-        // }
-
-        //payload
         if (playerResult !== null && playerResult !== undefined) {
-            data.payload[`p${idx}name`] = formatName(playerResult.name);
+            const [initial, surname] = formatName(playerResult.name);
+            
+            data.payload[`p${idx}initial`] = initial;
+            data.payload[`p${idx}name`] = surname;
             data.payload[`p${idx}flag`] = `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
             data.payload[`p${idx}avg`] = playerResult.average;
             data.payload[`p${idx}best`] = playerResult.best;
@@ -307,16 +311,12 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             data.payload[`p${idx}adv`] = playerResult.advancing;
             data.payload[`p${idx}color`] = playerResult.advancingColor;
             data.payload[`p${idx}count`] = playerResult.solveCount + "/" + round.format.numberOfAttempts;
-            data.payload[`p${idx}countColor`] = round.format.numberOfAttempts !== playerResult.solveCount ? "#cccccc" : "#FFFF00";
+            data.payload[`p${idx}countColor`] = round.format.numberOfAttempts !== playerResult.solveCount ? "#f3764c" : "#ffffff";
             data.payload[`p${idx}proj`] = round.format.numberOfAttempts !== playerResult.solveCount ? getSolvesRemaining(playerResult.solveCount, round.format.numberOfAttempts) + playerResult.solveProjection : round.format.sortBy === "average" ? playerResult.average : playerResult.solveProjection;
-            // playerResult.solves.forEach((solve, i) => {
-            //     data.model.fields.push({ "defaultValue": "", "id": `player${idx}solve${i}`, "title": `Player ${idx} Solve ${i}`, "type": "text" });
-            //     data.payload[`player${idx}solve${i}`] = solve
-            // })
             data.payload[`p${idx}bpa`] = playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
             data.payload[`p${idx}wpa`] = playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
-            data.payload[`p${idx}forA`] = playerResult.forAdvance === 0 ? "--" : playerResult.forAdvance;
-            data.payload[`p${idx}for1`] = playerResult.forFirst === 0 ? "--" : playerResult.forFirst;
+            data.payload[`p${idx}forA`] = playerResult.forAdvance === 0 ? "--" : formatAttemptResult(playerResult.forAdvance, eventId);
+            data.payload[`p${idx}for1`] = playerResult.forFirst === 0 ? "--" : formatAttemptResult(playerResult.forFirst, eventId);
         }
 
     }
@@ -379,10 +379,10 @@ function getInitialAndSurname(fullName) {
     const surname = nameParts[nameParts.length - 1];
 
     // Get the first letter of the given name
-    const initial = givenName.charAt(0);
+    const initial = givenName.charAt(0) + ".";
 
     // Combine the initial and surname
-    return `${initial}. ${surname}`;
+    return [initial, surname];
 }
 
 export function SendResults(player1, player2) {
@@ -788,29 +788,29 @@ function getHighlightColor(result, round){
             if(isFinished){
                 switch(result.ranking){
                     case 1:
-                        return "#EFBF04";
+                        return "#d7a800";
                     case 2:
-                        return "#C4C4C4";
+                        return "#aaaaaa";
                     case 3: 
-                        return "#CE8946";
+                        return "#bd7700";
                     default:
                         break;
                 }
             } else {
                 switch(result.ranking){
                     case 1:
-                        return "#EFBF04CC";
+                        return "#d7a800";
                     case 2:
-                        return "#C4C4C4CC";
+                        return "#aaaaaa";
                     case 3: 
-                        return "#CE8946CC";
+                        return "#bd7700";
                     default:
-                        if(result.advancingQuestionable) return "#800000CC";
+                        if(result.advancingQuestionable) return "#519234CC";
                 }
             }
         } else {
-            if(isFinished && result.advancing) return "#800000"; 
-            if(!isFinished && result.advancingQuestionable) return "#800000CC"; 
+            if(isFinished && result.advancing) return "#519234"; 
+            if(!isFinished && result.advancingQuestionable) return "#519234CC"; 
         }
     }
 

@@ -39,33 +39,36 @@ function StreamEvent({ roundId, projections }) {
     setMode(null);
     clearInterval(intervalRef.current);
     clearInterval(countdownRef.current);
-    setCountdown(10);
+    setCountdown(15);
   };
 
   const startTop20 = () => {
     stopTimers();
     setMode('top20');
-    setCountdown(10);
+    setCountdown(15);
 
     countdownRef.current = setInterval(() => {
-      setCountdown((prev) => (prev <= 1 ? 10 : prev - 1));
+      setCountdown((prev) => (prev <= 1 ? 15 : prev - 1));
     }, 1000);
 
     intervalRef.current = setInterval(async () => {
       const latestRound = await refresh();
       UpdateStreamRoundProjections(latestRound, 0, 20);
       console.log('Auto-refreshing Top 20');
-    }, 10000);
+    }, 15000);
+
+    //inital load
+    UpdateStreamRoundProjections(round, 0, 20);
   };
 
   const startRotate20 = () => {
     stopTimers();
     setMode('rotate20');
-    setCountdown(10);
-    toggleTopGroupRef.current = false;
+    setCountdown(15);
+    toggleTopGroupRef.current = true;
 
     countdownRef.current = setInterval(() => {
-      setCountdown((prev) => (prev <= 1 ? 10 : prev - 1));
+      setCountdown((prev) => (prev <= 1 ? 15 : prev - 1));
     }, 1000);
 
     intervalRef.current = setInterval(async () => {
@@ -74,7 +77,10 @@ function StreamEvent({ roundId, projections }) {
       UpdateStreamRoundProjections(latestRound, startIndex, 20);
       console.log(`Rotating: ${startIndex + 1} to ${startIndex + 20}`);
       toggleTopGroupRef.current = !toggleTopGroupRef.current;
-    }, 10000);
+    }, 15000);
+
+    //inital load
+    UpdateStreamRoundProjections(round, 0, 20);
   };
 
   const handleSelectRange = async (startIndex, intervalSize) => {
@@ -135,78 +141,79 @@ function StreamEvent({ roundId, projections }) {
           </Tooltip>
 
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-            {!projections && (
-              <>
-                {Array.from({ length: Math.ceil(round.results.length / 8) }, (_, i) => {
-                  const start = i * 8;
-                  return (
-                    <MenuItem key={`by8-${start}`} onClick={() => handleSelectRange(start, 8)}>
-                      {start + 1} to {Math.min(start + 8, round.results.length)}
-                    </MenuItem>
-                  );
-                })}
-              </>
-            )}
+            {!projections &&
+              Array.from({ length: Math.ceil(round.results.length / 8) }, (_, i) => {
+                const start = i * 8;
+                return (
+                  <MenuItem key={`by8-${start}`} onClick={() => handleSelectRange(start, 8)}>
+                    {start + 1} to {Math.min(start + 8, round.results.length)}
+                  </MenuItem>
+                );
+              })
+            }
 
             {projections && (
-              <>
-                <MenuItem disabled>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', opacity: 0.7 }}>
-                    By 8 Projections
-                  </Typography>
-                </MenuItem>
-                {Array.from({ length: Math.ceil(round.results.length / 8) }, (_, i) => {
-                  const start = i * 8;
-                  return (
-                    <MenuItem key={`by8-${start}`} onClick={() => handleSelectRange(start, 8)}>
-                      {start + 1} to {Math.min(start + 8, round.results.length)}
-                    </MenuItem>
-                  );
-                })}
-
-                <Divider />
-
-                <MenuItem disabled>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', opacity: 0.7 }}>
-                    Timers
-                  </Typography>
-                </MenuItem>
-
-                <MenuItem onClick={mode === 'top20' ? stopTimers : startTop20}>
-                  <ListItemIcon>
-                    {mode === 'top20' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
-                  </ListItemIcon>
-                  <ListItemText>
-                    {mode === 'top20' ? 'Stop Top 20 Timer' : 'Start Top 20 Timer'}
-                  </ListItemText>
-                </MenuItem>
-
-                <MenuItem onClick={mode === 'rotate20' ? stopTimers : startRotate20}>
-                  <ListItemIcon>
-                    {mode === 'rotate20' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
-                  </ListItemIcon>
-                  <ListItemText>
-                    {mode === 'rotate20' ? 'Stop Rotation Timer' : 'Start 20/40 Rotation'}
-                  </ListItemText>
-                </MenuItem>
-
-                <Divider />
-
-                <MenuItem disabled>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', opacity: 0.7 }}>
-                    By 20 Projections
-                  </Typography>
-                </MenuItem>
-                {Array.from({ length: Math.ceil(round.results.length / 20) }, (_, i) => {
-                  const start = i * 20;
-                  return (
-                    <MenuItem key={`by20-${start}`} onClick={() => handleSelectRange(start, 20)}>
-                      {start + 1} to {Math.min(start + 20, round.results.length)}
-                    </MenuItem>
-                  );
-                })}
-              </>
+              <MenuItem disabled>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', opacity: 0.7 }}>
+                  By 8 Projections
+                </Typography>
+              </MenuItem>
             )}
+
+            {projections &&
+              Array.from({ length: Math.ceil(round.results.length / 8) }, (_, i) => {
+                const start = i * 8;
+                return (
+                  <MenuItem key={`by8-${start}`} onClick={() => handleSelectRange(start, 8)}>
+                    {start + 1} to {Math.min(start + 8, round.results.length)}
+                  </MenuItem>
+                );
+              })
+            }
+
+            {projections && <Divider />}
+
+            {projections && <MenuItem disabled>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', opacity: 0.7 }}>
+                Timers
+              </Typography>
+            </MenuItem>}
+
+            {projections && <MenuItem onClick={mode === 'top20' ? stopTimers : startTop20}>
+              <ListItemIcon>
+                {mode === 'top20' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
+              </ListItemIcon>
+              <ListItemText>
+                {mode === 'top20' ? 'Stop Top 20 Timer' : 'Start Top 20 Timer'}
+              </ListItemText>
+            </MenuItem>
+            }
+
+            {projections && <MenuItem onClick={mode === 'rotate20' ? stopTimers : startRotate20}>
+              <ListItemIcon>
+                {mode === 'rotate20' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
+              </ListItemIcon>
+              <ListItemText>
+                {mode === 'rotate20' ? 'Stop Rotation Timer' : 'Start 20/40 Rotation'}
+              </ListItemText>
+            </MenuItem>}
+
+            {projections && <Divider />}
+
+            {projections && <MenuItem disabled>
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', opacity: 0.7 }}>
+                By 20 Projections
+              </Typography>
+            </MenuItem>}
+            {projections &&
+              Array.from({ length: Math.ceil(round.results.length / 20) }, (_, i) => {
+                const start = i * 20;
+                return (
+                  <MenuItem key={`by20-${start}`} onClick={() => handleSelectRange(start, 20)}>
+                    {start + 1} to {Math.min(start + 20, round.results.length)}
+                  </MenuItem>
+                );
+              })}
           </Menu>
         </>
       )}
