@@ -6,6 +6,12 @@ function getActivityTitle(eventName, roundName) {
     return `${eventName} ${roundName}`;
 }
 
+const ordinal = (n) => {
+    const s = ["TH", "ST", "ND", "RD"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
 export async function UpdateStreamRoundResults(round, rankRange) {
 
     const data = {
@@ -198,8 +204,8 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             "eventId": round.competitionEvent.event.id,
             "roundName": getActivityTitle(round.competitionEvent.event.name, round.name),
             "roundId": round.id,
-            "roundFormat": round.format.sortBy == "average" ? "AVG" : "BEST",
-            "roundAdvance": (round.advancementCondition === null) ? "3RD" : "ADV"
+            "roundFormat": round.format.sortBy == "average" ? "AVERAGE" : "BEST",
+            "roundAdvance": (round.advancementCondition === null) ? "FOR 3RD" : "FOR " + ordinal(round.advancementCondition.level) //"ADVANCE"
         }
     }
 
