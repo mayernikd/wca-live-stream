@@ -18,7 +18,7 @@ import { useRound } from '../../hooks/useRound';
 
 function StreamEvent({ roundId, projections }) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [mode, setMode] = useState(null); // null | 'top20' | 'rotate20'
+  const [mode, setMode] = useState(null); // null | 'top20' | 'rotate16' | 'rotate20'
   const [countdown, setCountdown] = useState(10);
 
   const intervalRef = useRef(null);
@@ -40,6 +40,27 @@ function StreamEvent({ roundId, projections }) {
     clearInterval(intervalRef.current);
     clearInterval(countdownRef.current);
     setCountdown(15);
+  };
+
+  const startRotate16 = () => {
+    stopTimers();
+    setMode('rotate16');
+    setCountdown(15);
+    toggleTopGroupRef.current = true;
+
+    countdownRef.current = setInterval(() => {
+      setCountdown((prev) => (prev <= 1 ? 15 : prev - 1));
+    }, 1000);
+
+    intervalRef.current = setInterval(async () => {
+      const latestRound = await refresh();
+      const startIndex = toggleTopGroupRef.current ? 16 : 0;
+      UpdateStreamRoundProjections(latestRound, startIndex, 16);
+      console.log(`Rotating 16: ${startIndex + 1} to ${startIndex + 16}`);
+      toggleTopGroupRef.current = !toggleTopGroupRef.current;
+    }, 15000);
+
+    UpdateStreamRoundProjections(round, 0, 16); // Initial load
   };
 
   const startTop20 = () => {
@@ -179,24 +200,28 @@ function StreamEvent({ roundId, projections }) {
               </Typography>
             </MenuItem>}
 
-            {projections && <MenuItem onClick={mode === 'top20' ? stopTimers : startTop20}>
-              <ListItemIcon>
-                {mode === 'top20' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
-              </ListItemIcon>
-              <ListItemText>
-                {mode === 'top20' ? 'Stop Top 20 Timer' : 'Start Top 20 Timer'}
-              </ListItemText>
-            </MenuItem>
+            {projections &&
+              <MenuItem onClick={mode === 'rotate16' ? stopTimers : startRotate16}>
+                <ListItemIcon>
+                  {mode === 'rotate16' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
+                </ListItemIcon>
+                <ListItemText>
+                  {mode === 'rotate16' ? 'Stop 16/32 Rotation' : 'Start 16/32 Rotation'}
+                </ListItemText>
+              </MenuItem>
             }
 
-            {projections && <MenuItem onClick={mode === 'rotate20' ? stopTimers : startRotate20}>
-              <ListItemIcon>
-                {mode === 'rotate20' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
-              </ListItemIcon>
-              <ListItemText>
-                {mode === 'rotate20' ? 'Stop Rotation Timer' : 'Start 20/40 Rotation'}
-              </ListItemText>
-            </MenuItem>}
+            {projections &&
+              <MenuItem onClick={mode === 'rotate20' ? stopTimers : startRotate20}>
+                <ListItemIcon>
+                  {mode === 'rotate20' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
+                </ListItemIcon>
+                <ListItemText>
+                  {mode === 'rotate20' ? 'Stop 20/40 Rotation' : 'Start 20/40 Rotation'}
+                </ListItemText>
+              </MenuItem>
+            }
+            
 
             {projections && <Divider />}
 

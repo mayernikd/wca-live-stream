@@ -102,7 +102,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
             //payload
             data.payload[`player${idx}name`] = result.person.name;
             data.payload[`player${idx}country`] = result.person.country.iso2;
-            data.payload[`player${idx}countryFlag`] = `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${result.person.country.iso2.toLowerCase()}.svg`;
+            data.payload[`player${idx}countryFlag`] = `https://raw.githubusercontent.com/mayernikd/flag-icons/refs/heads/main/flags/4x3/${result.person.country.iso2.toLowerCase()}.svg`;
             data.payload[`player${idx}solveAverage`] = formatAttemptResult(result.average, eventId);
             data.payload[`player${idx}solveBest`] = formatAttemptResult(result.best, eventId);
             data.payload[`player${idx}solveRank`] = result.ranking;
@@ -310,7 +310,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             
             data.payload[`p${idx}initial`] = initial;
             data.payload[`p${idx}name`] = surname;
-            data.payload[`p${idx}flag`] = `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
+            data.payload[`p${idx}flag`] = `https://raw.githubusercontent.com/mayernikd/flag-icons/refs/heads/main/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
             data.payload[`p${idx}avg`] = playerResult.average;
             data.payload[`p${idx}best`] = playerResult.best;
             data.payload[`p${idx}rank`] = idx + 1 + startNumber; //playerResult.ranking;

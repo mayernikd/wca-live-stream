@@ -608,7 +608,7 @@ async function init(eventId, person) {
             "pRankAverage": playerStats.rankAverage,
             "pRankSingle": playerStats.rankSingle,
             "pCountry": playerStats.country.toLowerCase(),
-            "pCountryImage": `https://raw.githubusercontent.com/lipis/flag-icons/b919a036693ee1ee0434ef5ae05f93543fc4f437/flags/4x3/${playerStats.country.toLowerCase()}.svg`,
+            "pCountryImage": `https://raw.githubusercontent.com/mayernikd/flag-icons/refs/heads/main/flags/4x3/${playerStats.country.toLowerCase()}.svg`,
             "pFact1": playerStats.fact1,
             "pFact2": playerStats.fact2,
             "pFact3": playerStats.fact3,

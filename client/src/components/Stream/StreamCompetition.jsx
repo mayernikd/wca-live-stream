@@ -4,7 +4,10 @@ import { parseActivityCode } from "../../lib/activity-code";
 import { eventRoundForActivityCode } from "../../lib/competition";
 
 function getActivityTitle(activityCode, competitionEvents) {
-    const { attemptNumber } = parseActivityCode(activityCode);
+    const { attemptNumber, type } = parseActivityCode(activityCode);
+
+    if(type === "other") return "";
+
     const { event, round } = eventRoundForActivityCode(competitionEvents, activityCode);
 
     return attemptNumber
@@ -33,20 +36,20 @@ function getTickerMessageStrings(venues, nowIsoString, competitionEvents) {
                 .sort((a, b) => a.startTime - b.startTime)[0];
 
             ongoing.forEach(activity => {
-                if (activity.activityCode !== "other-checkin") {
+                if (!activity.activityCode.startsWith("other-")) {
                     const title = getActivityTitle(activity.activityCode, competitionEvents);
                     nowEvents.push(`${title}, ${room.name}`);
                 } else {
-                    nowEvents.push(`${activity.name}`);
+                    nowEvents.push(`${activity.name}, ${room.name}`);
                 }
             });
 
             if (upcoming) {
-                if (upcoming.activityCode !== "other-checkin") {
+                if (!upcoming.activityCode.startsWith("other-")) {
                     const title = getActivityTitle(upcoming.activityCode, competitionEvents);
                     nextEvents.push(`${title}, ${room.name}`);
                 } else {
-                    nowEvents.push(`${upcoming.name}`);
+                    nowEvents.push(`${upcoming.name}, ${room.name}`);
                 }
             }
         });
@@ -54,7 +57,7 @@ function getTickerMessageStrings(venues, nowIsoString, competitionEvents) {
 
     return {
         "Now": "HAPPENING NOW:     " + nowEvents.join("\n") + "\n\n\n\n COMING UP NEXT:     " + nextEvents.join("\n")+ "\n\n\n\n",
-        "UpNext": nextEvents.join(" | ")
+        "UpNext": []
     };
 }
 
