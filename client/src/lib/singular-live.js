@@ -317,7 +317,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             data.payload[`p${idx}adv`] = playerResult.advancing;
             data.payload[`p${idx}color`] = playerResult.advancingColor;
             data.payload[`p${idx}count`] = playerResult.solveCount + "/" + round.format.numberOfAttempts;
-            data.payload[`p${idx}countColor`] = round.format.numberOfAttempts !== playerResult.solveCount ? "#f3764c" : "#ffffff";
+            data.payload[`p${idx}countColor`] = round.format.numberOfAttempts !== playerResult.solveCount ? "#FABFAB" : "#ffffff";
             data.payload[`p${idx}proj`] = round.format.numberOfAttempts !== playerResult.solveCount ? getSolvesRemaining(playerResult.solveCount, round.format.numberOfAttempts) + playerResult.solveProjection : round.format.sortBy === "average" ? playerResult.average : playerResult.solveProjection;
             data.payload[`p${idx}bpa`] = playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
             data.payload[`p${idx}wpa`] = playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
@@ -812,6 +812,7 @@ function getHighlightColor(result, round){
                         return "#bd7700";
                     default:
                         if(result.advancingQuestionable) return "#519234CC";
+                        if(result.advancing) return "#519234";
                 }
             }
         } else {
