@@ -789,7 +789,7 @@ function getHighlightColor(result, round){
     const isFinals = (round.advancementCondition === null);
     const isFinished = round.finished;
 
-    if(result.advancing){
+    if(result.advancing || result.advancingQuestionable){
         if(isFinals){
             if(isFinished){
                 switch(result.ranking){
