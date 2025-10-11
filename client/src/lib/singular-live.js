@@ -205,7 +205,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             "roundName": getActivityTitle(round.competitionEvent.event.name, round.name),
             "roundId": round.id,
             "roundFormat": round.format.sortBy == "average" ? "AVERAGE" : "BEST",
-            "roundAdvance": (round.advancementCondition === null) ? "FOR 3RD" : "FOR " + ordinal(round.advancementCondition.level) //"ADVANCE"
+            "roundAdvance": (round.advancementCondition === null) ? "FOR 3RD" : "FOR " + ordinal(round.advancementCondition.type=="percent" ? Math.floor((round.advancementCondition.level / 100) * round.results.length, 0) : round.advancementCondition.level) //"ADVANCE"
         }
     }
 
