@@ -98,7 +98,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
         .catch(error => console.log('error', error));
 }
 
-export async function UpdateStreamRoundProjections(round, rankRange) {
+export async function UpdateStreamRoundProjections(round) {
     const data = {
           "model": {
             "fields": [
@@ -164,7 +164,7 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
         const solves = []
         playerResult.rawSolves = []
         playerResult.solves = []
-        result.attempts.forEach((attempt, i)=>{
+        result.attempts.forEach((attempt)=>{
             solves.push(attempt.result)
             playerResult.rawSolves.push(attempt.result)
             playerResult.solves.push(formatAttemptResult(attempt.result, eventId))
@@ -191,7 +191,7 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
 
     playerResults.sort((a, b) => {
         switch(round.format.sortBy){
-            case "average":
+            case "average": {
                 const aVal = a.solveCount === round.format.numberOfAttempts ? a.average : a.solveProjection;
                 const bVal = b.solveCount === round.format.numberOfAttempts ? b.average : b.solveProjection;
 
@@ -199,11 +199,13 @@ export async function UpdateStreamRoundProjections(round, rankRange) {
                 if(bVal === "DNF") return aVal;
                 
                 return aVal - bVal
-            case "best":
+            } 
+            case "best": {
                 if(a.best === "DNF") return 1000000;
                 if(b.best === "DNF") return a.best;
                 
                 return a.best - b.best
+            }
             default:
                 return 0;
         }
