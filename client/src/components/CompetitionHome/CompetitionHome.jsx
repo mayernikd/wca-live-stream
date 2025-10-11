@@ -21,6 +21,7 @@ import { competitionCountries } from "../../lib/competition";
 import { getTimezone } from "../../lib/date";
 import RecordList from "../RecordList/RecordList";
 import { RECORD_LIST_RECORD_FRAGMENT } from "../RecordList/fragments";
+import StreamCompetition from "../Stream/StreamCompetition"
 
 const COMPETITION_QUERY = gql`
   query Competition($id: ID!) {
