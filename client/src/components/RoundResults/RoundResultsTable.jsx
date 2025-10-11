@@ -9,7 +9,7 @@ import {
   TableRow,
   Paper,
   useMediaQuery,
-} from '@mui/material';
+} from "@mui/material";
 import { yellow, green } from "@mui/material/colors";
 import { times } from "../../lib/utils";
 import { formatAttemptResult } from "../../lib/attempt-result";
