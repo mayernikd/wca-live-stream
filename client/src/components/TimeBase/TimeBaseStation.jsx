@@ -22,19 +22,16 @@ function TimeBaseStation({ competitionId, index, onData }) {
   
   // Connection opened
     socket.addEventListener("open", () => {
-      console.log("Hello - " + index);
       setcolor("#00ff00")
       ping();
     });
   
     socket.addEventListener("close", () => {
-      console.log("Closed - " + index);
       setcolor("#ff0000")
     });
   
     // Listen for messages
     socket.addEventListener("message", (event) => {
-      console.log("Message from server - " + index, event.data);
       const data = JSON.parse(event.data);
       setResults(data)
       

@@ -178,6 +178,7 @@ function RoundDoubleCheck() {
         spacing={2}
         {...handlers}
       >
+      <Grid container direction="row" alignItems="center" spacing={2}>
         <Grid item md sx={{ textAlign: "center" }}>
           <IconButton
             ref={leftButtonRef}
@@ -228,6 +229,7 @@ function RoundDoubleCheck() {
               scorecard at the top of the pile.`}
           </Typography>
         </Grid>
+      </Grid>
       </Grid>
     </>
   );

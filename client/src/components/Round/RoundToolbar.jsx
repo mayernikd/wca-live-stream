@@ -76,10 +76,10 @@ function RoundToolbar({ round, competitionId, forecastView, setForecastView }) {
               <TvIcon />
             </IconButton>
           </Tooltip>
-          <StreamEvent round={round} projections={true}/>
-          <StreamEvent round={round} projections={false}/>
         </Grid>
       )}
+      <StreamEvent roundId={round.id} projections={true}/>
+      <StreamEvent roundId={round.id} projections={false}/>
     </Grid>
   );
 }

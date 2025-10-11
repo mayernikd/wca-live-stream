@@ -28,6 +28,7 @@ const COMPETITION_QUERY = gql`
       id
       wcaId
       name
+      shortName
       competitionRecords {
         ...records
       }
@@ -150,6 +151,9 @@ function CompetitionHome() {
             >
               <NotificationImportantIcon color="action" />
             </Tooltip>
+          </Grid>
+          <Grid item>
+            <StreamCompetition competition={competition} venues={competition.venues}/>
           </Grid>
         </Grid>
         <Schedule

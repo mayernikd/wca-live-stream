@@ -81,11 +81,7 @@ const RoundResultsTable = memo(
               <TableCell
                 sx={{ ...styles.cell,...styles.ranking }}
                 align="right"
-              >PR</TableCell>
-              <TableCell
-                sx={{ ...styles.cell,...styles.ranking }}
-                align="right"
-              >AVG</TableCell>
+              >Stream</TableCell>
               <TableCell sx={styles.cell}>Name</TableCell>
               {mdScreen && <TableCell sx={styles.cell}>Country</TableCell>}
               {smScreen &&
@@ -132,16 +128,7 @@ const RoundResultsTable = memo(
                     ...styles.ranking,
                   }}
                 >
-                  <StreamUser type={"single"} eventId={eventId} wcaId={result.person.wcaId}/>
-                </TableCell>
-                <TableCell
-                  align="right"
-                  sx={{
-                    ...styles.cell,
-                    ...styles.ranking,
-                  }}
-                >
-                  <StreamUser type={"average"} eventId={eventId} wcaId={result.person.wcaId}/>
+                  <StreamUser eventId={eventId} person={result.person}/>
                 </TableCell>
                 <TableCell sx={{ ...styles.cell, ...styles.name }}>
                   {smScreen ? (

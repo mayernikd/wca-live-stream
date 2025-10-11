@@ -4,6 +4,8 @@ import { shouldComputeAverage } from "./result";
 export const SKIPPED_VALUE = 0;
 export const DNF_VALUE = -1;
 export const DNS_VALUE = -2;
+export const NA_VALUE = -3;
+export const SUCCESS_VALUE = -4;
 
 export function isComplete(attemptResult) {
   return attemptResult > 0;
@@ -293,6 +295,9 @@ export function centisecondsToClockFormat(centiseconds) {
  * formatAttemptResult(900348002, '333mbf'); // => '11/13 58:00'
  */
 export function formatAttemptResult(attemptResult, eventId) {
+  if (attemptResult === NA_VALUE) return "N/A";
+  if (attemptResult === SUCCESS_VALUE) return "SUCCESS";
+  
   if (attemptResult === SKIPPED_VALUE) return "";
   if (attemptResult === DNF_VALUE) return "DNF";
   if (attemptResult === DNS_VALUE) return "DNS";

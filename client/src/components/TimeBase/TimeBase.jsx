@@ -1,10 +1,12 @@
-import { gql, useQuery } from '@apollo/client';
-import { useParams } from 'react-router-dom';
-import Loading from '../Loading/Loading';
-import Error from '../Error/Error';
-import TimeBaseStations from './TimeBaseStations';
+import { gql, useQuery } from "@apollo/client";
+import { useParams } from "react-router-dom";
 
-const COMPETITORS_QUERY = gql`
+import Loading from "../Loading/Loading";
+import Error from "../Error/Error";
+import TimeBaseStations from "./TimeBaseStations";
+
+// GraphQL query to fetch competition details and its competitors
+export const COMPETITORS_QUERY = gql/* GraphQL */ `
   query Competition($competitionId: ID!) {
     competition(id: $competitionId) {
       id
@@ -21,19 +23,26 @@ const COMPETITORS_QUERY = gql`
 `;
 
 function TimeBase() {
+  // Expect a route like "/competition/:competitionId/time-base"
   const { competitionId } = useParams();
+
   const { data, loading, error } = useQuery(COMPETITORS_QUERY, {
-    variables: { competitionId: competitionId },
+    variables: { competitionId },
+    fetchPolicy: "cache-first",
   });
 
-  if (loading && !data) return <Loading />;
+  if (loading) return <Loading />;
   if (error) return <Error error={error} />;
-  const { competition } = data;
+  if (!data) return null; // Safeguard against undefined data
+
+  const {
+    competition: { competitors, wcaId: competitionWcaId },
+  } = data;
 
   return (
     <TimeBaseStations
-      competitors={competition.competitors}
-      competitionId={competition.wcaId}
+      competitors={competitors}
+      competitionId={competitionWcaId}
     />
   );
 }
