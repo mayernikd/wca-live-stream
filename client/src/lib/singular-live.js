@@ -135,7 +135,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
 
 export async function UpdateStreamRoundProjections(round, startNumber, numRecords) {
 
-    const viewResults = resultsForView(round.results,
+    const viewResults = resultsForView(round.results.filter(rr=>rr.person.country.iso2 == "US"),
         round.competitionEvent.event.id,
         round.format,
         true,
