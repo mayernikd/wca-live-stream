@@ -1,7 +1,6 @@
-import React from 'react';
 import { IconButton, Tooltip } from '@mui/material';
 import StreamIcon from '@mui/icons-material/Stream';
-import { average, formatAttemptResult } from '../../lib/attempt-result';
+import { formatAttemptResult } from '../../lib/attempt-result';
 import { getEventName } from '../../lib/event-utils';
 
 function getTopFacts(data, years, currentEventId) {

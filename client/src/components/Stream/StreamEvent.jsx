@@ -63,9 +63,9 @@ function StreamEvent({ roundId, projections }) {
     UpdateStreamRoundProjections(round, 0, 16); // Initial load
   };
 
-  const startTop20 = () => {
+  const startTop8 = () => {
     stopTimers();
-    setMode('top20');
+    setMode('top8');
     setCountdown(15);
 
     countdownRef.current = setInterval(() => {
@@ -74,17 +74,17 @@ function StreamEvent({ roundId, projections }) {
 
     intervalRef.current = setInterval(async () => {
       const latestRound = await refresh();
-      UpdateStreamRoundProjections(latestRound, 0, 20);
-      console.log('Auto-refreshing Top 20');
+      UpdateStreamRoundProjections(latestRound, 0, 8);
+      console.log('Auto-refreshing Top 8');
     }, 15000);
 
     //inital load
-    UpdateStreamRoundProjections(round, 0, 20);
+    UpdateStreamRoundProjections(round, 0, 8);
   };
 
-  const startRotate20 = () => {
+  const startRotate8 = () => {
     stopTimers();
-    setMode('rotate20');
+    setMode('rotate8');
     setCountdown(15);
     toggleTopGroupRef.current = true;
 
@@ -94,14 +94,14 @@ function StreamEvent({ roundId, projections }) {
 
     intervalRef.current = setInterval(async () => {
       const latestRound = await refresh();
-      const startIndex = toggleTopGroupRef.current ? 20 : 0;
-      UpdateStreamRoundProjections(latestRound, startIndex, 20);
-      console.log(`Rotating: ${startIndex + 1} to ${startIndex + 20}`);
+      const startIndex = toggleTopGroupRef.current ? 8 : 0;
+      UpdateStreamRoundProjections(latestRound, startIndex, 8);
+      console.log(`Rotating: ${startIndex + 1} to ${startIndex + 8}`);
       toggleTopGroupRef.current = !toggleTopGroupRef.current;
     }, 15000);
 
     //inital load
-    UpdateStreamRoundProjections(round, 0, 20);
+    UpdateStreamRoundProjections(round, 0, 8);
   };
 
   const handleSelectRange = async (startIndex, intervalSize) => {
@@ -212,12 +212,12 @@ function StreamEvent({ roundId, projections }) {
             }
 
             {projections &&
-              <MenuItem onClick={mode === 'rotate20' ? stopTimers : startRotate20}>
+              <MenuItem onClick={mode === 'rotate8' ? stopTimers : startRotate8}>
                 <ListItemIcon>
-                  {mode === 'rotate20' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
+                  {mode === 'rotate8' ? <StopIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
                 </ListItemIcon>
                 <ListItemText>
-                  {mode === 'rotate20' ? 'Stop 20/40 Rotation' : 'Start 20/40 Rotation'}
+                  {mode === 'rotate8' ? 'Stop 8/16 Rotation' : 'Start 8/16 Rotation'}
                 </ListItemText>
               </MenuItem>
             }

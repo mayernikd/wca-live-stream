@@ -14,8 +14,8 @@ import { createAbsintheSocketLink } from "@absinthe/socket-apollo-link";
 // Http link
 const baseHttpLink = new HttpLink(
   import.meta.env.PROD
-    ? { uri: 'https://live.worldcubeassociation.org/api', credentials: "same-origin" }
-    : { uri: 'https://live.worldcubeassociation.org/api', credentials: "same-origin" },
+    ? { uri: 'https://live.worldcubeassociation.org/api', credentials: 'same-origin' }
+    : { uri: 'https://live.worldcubeassociation.org/api', credentials: 'same-origin' }
 );
 
 const retryLink = new RetryLink({
@@ -36,8 +36,8 @@ const httpLink = import.meta.env.PROD
 // Create a standard Phoenix websocket connection.
 const phoenixSocket = new PhoenixSocket(
   import.meta.env.PROD
-    ? `wss://live.worldcubeassociation.org/socket`
-    : "wss://live.worldcubeassociation.org/socket",
+    ? `wss://${window.location.host}/socket`
+    : "ws://localhost:4000/socket",
 );
 
 // Wrap the Phoenix socket in an AbsintheSocket.

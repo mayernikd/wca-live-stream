@@ -32,6 +32,7 @@ wca_live-*.tar
 /client/node_modules/
 /client/npm-debug.log*
 /client/coverage/
+/client/build/
 
 # Environment failes
 /.env

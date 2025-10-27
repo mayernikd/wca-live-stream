@@ -135,7 +135,7 @@ export async function UpdateStreamRoundResults(round, rankRange) {
 
 export async function UpdateStreamRoundProjections(round, startNumber, numRecords) {
 
-    const viewResults = resultsForView(round.results,
+    const viewResults = resultsForView(round.results.filter(rr=>rr.person.country.iso2 == "US"),
         round.competitionEvent.event.id,
         round.format,
         true,
@@ -205,7 +205,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             "roundName": getActivityTitle(round.competitionEvent.event.name, round.name),
             "roundId": round.id,
             "roundFormat": round.format.sortBy == "average" ? "AVERAGE" : "BEST",
-            "roundAdvance": (round.advancementCondition === null) ? "FOR 3RD" : "FOR " + ordinal(round.advancementCondition.level) //"ADVANCE"
+            "roundAdvance": (round.advancementCondition === null) ? "FOR 3RD" : "FOR " + ordinal(round.advancementCondition.type=="percent" ? Math.floor((round.advancementCondition.level / 100) * round.results.length, 0) : round.advancementCondition.level) //"ADVANCE"
         }
     }
 
@@ -216,7 +216,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         const solves = []
         playerResult.rawSolves = []
         playerResult.solves = []
-        result.attempts.forEach((attempt) => {
+        result.attempts.forEach((attempt)=>{
             solves.push(attempt.result)
             playerResult.rawSolves.push(attempt.result)
             playerResult.solves.push(formatAttemptResult(attempt.result, eventId))
@@ -247,8 +247,8 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
     });
 
     playerResults.sort((a, b) => {
-        switch (round.format.sortBy) {
-            case "average":
+        switch(round.format.sortBy){
+            case "average": {
                 const aVal = a.solveCount === round.format.numberOfAttempts ? a.average : a.solveProjection;
                 const bVal = b.solveCount === round.format.numberOfAttempts ? b.average : b.solveProjection;
 
@@ -256,11 +256,13 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
                 if (bVal === "DNF") return aVal;
 
                 return aVal - bVal
-            case "best":
-                if (a.best === "DNF") return 1000000;
-                if (b.best === "DNF") return a.best;
-
+            } 
+            case "best": {
+                if(a.best === "DNF") return 1000000;
+                if(b.best === "DNF") return a.best;
+                
                 return a.best - b.best
+            }
             default:
                 return 0;
         }

@@ -9,7 +9,7 @@ import {
 import TimeBaseStation from './TimeBaseStation';
 import { SendResults } from '../../lib/singular-live'; 
 
-function TimeBaseStations({ competitors, competitionId }) {
+function TimeBaseStations({ competitionId }) {
 
   const [playerData, setPlayerData] = useState([
     {

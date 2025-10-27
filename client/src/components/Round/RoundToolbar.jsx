@@ -11,7 +11,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import InsightsIcon from "@mui/icons-material/Insights";
 import TimelineIcon from "@mui/icons-material/Timeline";
 import { appUrl } from "../../lib/urls";
-import StreamEvent from "../Stream/StreamEvent";
+import StreamEvent from '../Stream/StreamEvent';
 
 function RoundToolbar({ round, competitionId, forecastView, setForecastView }) {
   const mdScreen = useMediaQuery((theme) => theme.breakpoints.up("md"));
@@ -25,7 +25,7 @@ function RoundToolbar({ round, competitionId, forecastView, setForecastView }) {
       </Grid>
       <Grid item style={{ flexGrow: 1 }} />
       <Grid item>
-        {forecastView ? (
+        {forecastView || false ? (
           <Tooltip title="Default view" placement="top">
             <IconButton onClick={() => setForecastView(false)} size="large">
               <TimelineIcon />
@@ -48,7 +48,7 @@ function RoundToolbar({ round, competitionId, forecastView, setForecastView }) {
             <IconButton
               onClick={() => setForecastView(true)}
               size="large"
-              // disabled={!forecastViewSupported(round)}
+              disabled={false} //!forecastViewSupported(round)}
             >
               <InsightsIcon />
             </IconButton>
