@@ -56,7 +56,8 @@ function getTickerMessageStrings(venues, nowIsoString, competitionEvents) {
     });
 
     return {
-        "Now": "HAPPENING NOW:     " + nowEvents.join("\n") + "\n\n\n\n COMING UP NEXT:     " + nextEvents.join("\n")+ "\n\n\n\n",
+        //"Now": "HAPPENING NOW:     " + nowEvents.join("\n") + "\n\n\n\n COMING UP NEXT:     " + nextEvents.join("\n")+ "\n\n\n\n",
+        "Now": "HAPPENING NOW: Xuanyi Geng (耿暄一) vs. Yiheng Wang (王艺衡) \n\n\n\n COMING UP NEXT: Awards\n\n\n\n",
         "UpNext": []
     };
 }

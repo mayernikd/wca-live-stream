@@ -308,16 +308,16 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         data.payload[`p${idx}for1`] = "";
 
         if (playerResult !== null && playerResult !== undefined) {
-            const [initial, surname] = formatName(playerResult.name);
+            const formattedName = formatName(playerResult.name);
             
-            data.payload[`p${idx}initial`] = initial;
-            data.payload[`p${idx}name`] = surname;
+            data.payload[`p${idx}initial`] = "";
+            data.payload[`p${idx}name`] = formattedName;
             data.payload[`p${idx}flag`] = `https://raw.githubusercontent.com/mayernikd/flag-icons/refs/heads/main/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
-            data.payload[`p${idx}avg`] = playerResult.average;
+            data.payload[`p${idx}avg`] = playerResult.best; //playerResult.average;
             data.payload[`p${idx}best`] = playerResult.best;
             data.payload[`p${idx}rank`] = idx + 1 + startNumber; //playerResult.ranking;
             data.payload[`p${idx}adv`] = playerResult.advancing;
-            data.payload[`p${idx}color`] = playerResult.advancingColor;
+            data.payload[`p${idx}color`] = idx + 1 + startNumber < 21 ? "#519234" : "#00000000"; playerResult.advancingColor;
             data.payload[`p${idx}count`] = playerResult.solveCount + "/" + round.format.numberOfAttempts;
             data.payload[`p${idx}countColor`] = round.format.numberOfAttempts !== playerResult.solveCount ? "#FABFAB" : "#ffffff";
             data.payload[`p${idx}proj`] = round.format.numberOfAttempts !== playerResult.solveCount ? getSolvesRemaining(playerResult.solveCount, round.format.numberOfAttempts) + playerResult.solveProjection : round.format.sortBy === "average" ? playerResult.average : playerResult.solveProjection;
@@ -387,10 +387,10 @@ function getInitialAndSurname(fullName) {
     const surname = nameParts[nameParts.length - 1];
 
     // Get the first letter of the given name
-    const initial = givenName.charAt(0) + ".";
+    const initial = surname; //.charAt(0) + ".";
 
     // Combine the initial and surname
-    return [initial, surname];
+    return `${givenName} ${initial}`;
 }
 
 export function SendResults(player1, player2) {
