@@ -313,7 +313,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             data.payload[`p${idx}initial`] = "";
             data.payload[`p${idx}name`] = formattedName;
             data.payload[`p${idx}flag`] = `https://raw.githubusercontent.com/mayernikd/flag-icons/refs/heads/main/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
-            data.payload[`p${idx}avg`] = playerResult.best; //playerResult.average;
+            data.payload[`p${idx}avg`] = playerResult.average; //playerResult.average;
             data.payload[`p${idx}best`] = playerResult.best;
             data.payload[`p${idx}rank`] = idx + 1 + startNumber; //playerResult.ranking;
             data.payload[`p${idx}adv`] = playerResult.advancing;
