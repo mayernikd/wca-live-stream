@@ -275,7 +275,7 @@ export function mbldAttemptResultToPoints(attemptResult) {
  * Converts centiseconds to a human-friendly string.
  */
 export function centisecondsToClockFormat(centiseconds) {
-  if(centiseconds == "--") return "--"
+  if(centiseconds == "--" || centiseconds == "") return "--"
   if (!Number.isFinite(centiseconds)) {
     throw new Error(
       `Invalid centiseconds, expected positive number, got ${centiseconds}.`,

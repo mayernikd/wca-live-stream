@@ -142,7 +142,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         round.advancementCondition,
     )
 
-    console.log(viewResults);
+    //console.log(viewResults);
     
     const data = {
         "model": {
@@ -211,6 +211,8 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
 
     let eventId = round.competitionEvent.event.id;
     const playerResults = []
+    const playerWaiting = []
+
     viewResults.forEach((result) => {
         const playerResult = {}
         const solves = []
@@ -228,6 +230,24 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
         */
         if (result.ranking !== null && result.attempts !== null) {
             playerResults.push({
+                ...playerResult,
+                name: result.person.name,
+                country: result.person.country.iso2,
+                average: result.attempts.length == round.format.numberOfAttempts ? formatAttemptResult(result.average, eventId) : formatAttemptResult(result.projectedAverage, eventId),
+                best: formatAttemptResult(result.best, eventId),
+                ranking: result.ranking,
+                advancing: result.advancing,
+                advancingColor: getHighlightColor(result, round),
+                solveCount: result.attempts.length,
+                solveProjection: formatAttemptResult(averageProjection(solves, round.format.sortBy, round.format.numberOfAttempts)),
+                BPA: result.bestPossibleAverage,
+                WPA: result.worstPossibleAverage,
+                forAdvance: result.forAdvance,
+                forFirst: result.forFirst
+            })
+        }
+        else {
+            playerWaiting.push({
                 ...playerResult,
                 name: result.person.name,
                 country: result.person.country.iso2,
@@ -271,7 +291,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
     });
 
     for (var idx = 0; idx < numRecords; idx++) {
-        const playerResult =  (idx + startNumber) < playerResults.length  ? playerResults[idx + startNumber] : null
+        const playerResult =  (idx + startNumber) < playerResults.length  ? playerResults[idx + startNumber] : playerWaiting[idx + startNumber - playerResults.length]
 
         //model
         data.model.fields.push({ "defaultValue": "", "id": `p${idx}initial`, "title": `Player ${idx} Initial`, "type": "text" });
@@ -317,16 +337,15 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             data.payload[`p${idx}best`] = playerResult.best;
             data.payload[`p${idx}rank`] = idx + 1 + startNumber; //playerResult.ranking;
             data.payload[`p${idx}adv`] = playerResult.advancing;
-            data.payload[`p${idx}color`] = idx + 1 + startNumber < 21 ? "#519234" : "#00000000"; playerResult.advancingColor;
+            data.payload[`p${idx}color`] = playerResult.advancingColor;
             data.payload[`p${idx}count`] = playerResult.solveCount + "/" + round.format.numberOfAttempts;
             data.payload[`p${idx}countColor`] = round.format.numberOfAttempts !== playerResult.solveCount ? "#FABFAB" : "#ffffff";
             data.payload[`p${idx}proj`] = round.format.numberOfAttempts !== playerResult.solveCount ? getSolvesRemaining(playerResult.solveCount, round.format.numberOfAttempts) + playerResult.solveProjection : round.format.sortBy === "average" ? playerResult.average : playerResult.solveProjection;
-            data.payload[`p${idx}bpa`] = playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
-            data.payload[`p${idx}wpa`] = playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
+            data.payload[`p${idx}bpa`] = playerResult.bestPossibleAverage === undefined || playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
+            data.payload[`p${idx}wpa`] = playerResult.worstPossibleAverage === undefined || playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
             data.payload[`p${idx}forA`] = playerResult.forAdvance === 0 ? "--" : formatAttemptResult(playerResult.forAdvance, eventId);
             data.payload[`p${idx}for1`] = playerResult.forFirst === 0 ? "--" : formatAttemptResult(playerResult.forFirst, eventId);
         }
-
     }
 
     var myHeaders = new Headers();
