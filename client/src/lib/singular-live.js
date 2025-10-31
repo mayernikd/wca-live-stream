@@ -240,8 +240,8 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
                 advancingColor: getHighlightColor(result, round),
                 solveCount: result.attempts.length,
                 solveProjection: formatAttemptResult(averageProjection(solves, round.format.sortBy, round.format.numberOfAttempts)),
-                BPA: result.bestPossibleAverage,
-                WPA: result.worstPossibleAverage,
+                bestPossibleAverage: formatAttemptResult(result.bestPossibleAverage, eventId),
+                worstPossibleAverage: formatAttemptResult(result.worstPossibleAverage, eventId),
                 forAdvance: result.forAdvance,
                 forFirst: result.forFirst
             })
@@ -258,8 +258,8 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
                 advancingColor: getHighlightColor(result, round),
                 solveCount: result.attempts.length,
                 solveProjection: formatAttemptResult(averageProjection(solves, round.format.sortBy, round.format.numberOfAttempts)),
-                BPA: result.bestPossibleAverage,
-                WPA: result.worstPossibleAverage,
+                bestPossibleAverage: formatAttemptResult(result.bestPossibleAverage, eventId),
+                worstPossibleAverage: formatAttemptResult(result.worstPossibleAverage, eventId),
                 forAdvance: result.forAdvance,
                 forFirst: result.forFirst
             })
