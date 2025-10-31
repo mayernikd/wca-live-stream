@@ -204,7 +204,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             "eventId": round.competitionEvent.event.id,
             "roundName": getActivityTitle(round.competitionEvent.event.name, round.name),
             "roundId": round.id,
-            "roundFormat": round.format.sortBy == "average" ? "AVERAGE" : "BEST",
+            "roundFormat": round.format.sortBy == "average" ? (round.format.numberOfAttempts === 5 ? "AVERAGE" : "MEAN") : "BEST",
             "roundAdvance": (round.advancementCondition === null) ? "FOR 3RD" : "FOR " + ordinal(round.advancementCondition.type=="percent" ? Math.floor((round.advancementCondition.level / 100) * round.results.length, 0) : round.advancementCondition.level) //"ADVANCE"
         }
     }
@@ -234,6 +234,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
                 name: result.person.name,
                 country: result.person.country.iso2,
                 average: result.attempts.length == round.format.numberOfAttempts ? formatAttemptResult(result.average, eventId) : formatAttemptResult(result.projectedAverage, eventId),
+                bestMilli: result.best,
                 best: formatAttemptResult(result.best, eventId),
                 ranking: result.ranking,
                 advancing: result.advancing,
@@ -251,17 +252,18 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
                 ...playerResult,
                 name: result.person.name,
                 country: result.person.country.iso2,
-                average: result.attempts.length == round.format.numberOfAttempts ? formatAttemptResult(result.average, eventId) : formatAttemptResult(result.projectedAverage, eventId),
-                best: formatAttemptResult(result.best, eventId),
+                average: "--",
+                bestMilli: 1000000,
+                best: "--",
                 ranking: result.ranking,
                 advancing: result.advancing,
                 advancingColor: getHighlightColor(result, round),
                 solveCount: result.attempts.length,
-                solveProjection: formatAttemptResult(averageProjection(solves, round.format.sortBy, round.format.numberOfAttempts)),
-                bestPossibleAverage: formatAttemptResult(result.bestPossibleAverage, eventId),
-                worstPossibleAverage: formatAttemptResult(result.worstPossibleAverage, eventId),
-                forAdvance: result.forAdvance,
-                forFirst: result.forFirst
+                solveProjection: "--",
+                bestPossibleAverage: "--",
+                worstPossibleAverage: "--",
+                forAdvance: "--",
+                forFirst: "--"
             })
         }
     });
@@ -279,9 +281,9 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             } 
             case "best": {
                 if(a.best === "DNF") return 1000000;
-                if(b.best === "DNF") return a.best;
+                if(b.best === "DNF") return a.bestMilli;
                 
-                return a.best - b.best
+                return a.bestMilli - b.bestMilli
             }
             default:
                 return 0;
@@ -333,7 +335,7 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             data.payload[`p${idx}initial`] = "";
             data.payload[`p${idx}name`] = formattedName;
             data.payload[`p${idx}flag`] = `https://raw.githubusercontent.com/mayernikd/flag-icons/refs/heads/main/flags/4x3/${playerResult.country.toLowerCase()}.svg`;
-            data.payload[`p${idx}avg`] = playerResult.average; //playerResult.average;
+            data.payload[`p${idx}avg`] = round.format.sortBy == "average" ? playerResult.average : playerResult.best; //playerResult.average;
             data.payload[`p${idx}best`] = playerResult.best;
             data.payload[`p${idx}rank`] = idx + 1 + startNumber; //playerResult.ranking;
             data.payload[`p${idx}adv`] = playerResult.advancing;
@@ -341,8 +343,8 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
             data.payload[`p${idx}count`] = playerResult.solveCount + "/" + round.format.numberOfAttempts;
             data.payload[`p${idx}countColor`] = round.format.numberOfAttempts !== playerResult.solveCount ? "#FABFAB" : "#ffffff";
             data.payload[`p${idx}proj`] = round.format.numberOfAttempts !== playerResult.solveCount ? getSolvesRemaining(playerResult.solveCount, round.format.numberOfAttempts) + playerResult.solveProjection : round.format.sortBy === "average" ? playerResult.average : playerResult.solveProjection;
-            data.payload[`p${idx}bpa`] = playerResult.bestPossibleAverage === undefined || playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
-            data.payload[`p${idx}wpa`] = playerResult.worstPossibleAverage === undefined || playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
+            data.payload[`p${idx}bpa`] = playerResult.bestPossibleAverage === "" || playerResult.bestPossibleAverage === 0 ? "--" : playerResult.bestPossibleAverage;
+            data.payload[`p${idx}wpa`] = playerResult.worstPossibleAverage === "" || playerResult.worstPossibleAverage === 0 ? "--" : playerResult.worstPossibleAverage;
             data.payload[`p${idx}forA`] = playerResult.forAdvance === 0 ? "--" : formatAttemptResult(playerResult.forAdvance, eventId);
             data.payload[`p${idx}for1`] = playerResult.forFirst === 0 ? "--" : formatAttemptResult(playerResult.forFirst, eventId);
         }
