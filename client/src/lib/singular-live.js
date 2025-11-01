@@ -839,7 +839,7 @@ function getHighlightColor(result, round){
                 }
             }
         } else {
-            if(isFinished && result.advancing) return "#519234"; 
+            if(result.advancing) return "#519234"; 
             if(!isFinished && result.advancingQuestionable) return "#519234CC"; 
         }
     }
