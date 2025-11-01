@@ -269,28 +269,32 @@ export async function UpdateStreamRoundProjections(round, startNumber, numRecord
     });
 
     playerResults.sort((a, b) => {
-        switch(round.format.sortBy){
-            case "average": {
-                const aVal = a.solveCount === round.format.numberOfAttempts ? a.average : a.solveProjection;
-                const bVal = b.solveCount === round.format.numberOfAttempts ? b.average : b.solveProjection;
+        //switch(round.format.sortBy){
+            return a.ranking - b.ranking
+            //case "average": {
+                //const aVal = a.solveCount === round.format.numberOfAttempts ? a.average : a.solveProjection;
+                //const bVal = b.solveCount === round.format.numberOfAttempts ? b.average : b.solveProjection;
 
-                if (aVal === "DNF") return 1000000;
-                if (bVal === "DNF") return aVal;
+                //if (aVal === "DNF" || aVal < 0) return 1000000;
+                //if (bVal === "DNF" || aVal < 0) return aVal;
 
-                return aVal - bVal
-            } 
-            case "best": {
-                if(a.best === "DNF") return 1000000;
-                if(b.best === "DNF") return a.bestMilli;
+                //return aVal - bVal
+                //return a.ranking - b.ranking
+            //} 
+            //case "best": {
+                //if(a.best === "DNF" || a.best < 0) return 1000000;
+                //if(b.best === "DNF" || b.best < 0) return a.bestMilli;
                 
-                return a.bestMilli - b.bestMilli
-            }
-            default:
-                return 0;
+                //return a.bestMilli - b.bestMilli
+                //return a.ranking - b.ranking
+            //}
+            //default:
+            //    return 0;
         }
 
 
-    });
+        //    }
+    );
 
     for (var idx = 0; idx < numRecords; idx++) {
         const playerResult =  (idx + startNumber) < playerResults.length  ? playerResults[idx + startNumber] : playerWaiting[idx + startNumber - playerResults.length]
