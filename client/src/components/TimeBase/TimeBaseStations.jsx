@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import TimeBaseStation from './TimeBaseStation';
 import { SendResults } from '../../lib/singular-live'; 
+import { GetTimeBaseStation } from '../../lib/singular-live';
 
 function TimeBaseStations({ competitionId }) {
 
@@ -30,29 +31,34 @@ function TimeBaseStations({ competitionId }) {
     <Grid container direction="column" alignItems="center" spacing={1}>
       <Grid container item xs={12}>
           {[1,2,3,4,5,6,7,8,9,10,11,12].map((index) => (
-            <Grid key={"Players-" + index} container item xs={12}>
+            <Grid key={"Players-" + index} container item xs={6}>
               <Grid container item xs={1}>
                 <Button
                     key={"Player1-" + index}
                     button
                     onClick={() => {
-                      setPlayerData([
-                        {
-                          channel: index,
-                          player: null
-                        },
-                        {
-                          channel: playerData[1].channel,
-                          player: playerData[1].player
+                      GetTimeBaseStation(index, (ret) => {
+                        if(ret !== null){
+                          setPlayerData([
+                            {
+                              channel: index,
+                              player: JSON.parse(ret)
+                            },
+                            {
+                              channel: playerData[1].channel,
+                              player: playerData[1].player
+                            }
+                          ])
                         }
-                      ])
+                      })
+                      
                     }}
                 >
                   <Card
-                    style={{paddingTop: 0, paddingBottom: 0, backgroundColor: playerData[0].channel === index ? "green" : "red"}}
+                    style={{paddingTop: 0, paddingBottom: 0, backgroundColor: playerData[0].channel === index ? "green" : "grey"}}
                   >
                     <CardContent>
-                      <Typography variant='h4' color={"white"}>P1</Typography>
+                      <Typography variant='h5' color={"white"}>P1</Typography>
                     </CardContent>
                   </Card>
                 </Button>
@@ -62,23 +68,27 @@ function TimeBaseStations({ competitionId }) {
                     key={"Player2-" + index}
                     button
                     onClick={() => {
-                      setPlayerData([
-                        {
-                          channel: playerData[0].channel,
-                          player: playerData[0].player
-                        },
-                        {
-                          channel: index,
-                          player: null
+                      GetTimeBaseStation(index, (ret) => {
+                        if(ret !== null){
+                          setPlayerData([
+                            {
+                              channel: playerData[0].channel,
+                              player: playerData[0].player
+                            },
+                            {
+                              channel: index,
+                              player: JSON.parse(ret)
+                            }
+                          ])
                         }
-                      ])
+                      })
                     }}
                 >
                   <Card
-                    style={{paddingTop: 0, paddingBottom: 0, backgroundColor: playerData[1].channel === index ? "green" : "red"}}
+                    style={{paddingTop: 0, paddingBottom: 0, backgroundColor: playerData[1].channel === index ? "green" : "grey"}}
                   >
                     <CardContent>
-                      <Typography variant='h4' color={"white"}>P2</Typography>
+                      <Typography variant='h5' color={"white"}>P2</Typography>
                     </CardContent>
                   </Card>
                 </Button>

@@ -19,7 +19,7 @@ function TimeBaseStation({ competitionId, index, onData }) {
     //var ws = new WebSocket('wss://api.timebase.live/livestream/BayAreaSpeedcubin632024/1');
   
     //const socket = new WebSocket(`wss://api.timebase.live/livestream/${competitionId}/${index}`);
-    const socket = new WebSocket(`wss://api.timebase.live/livestream/12345/${index}`);
+    const socket = new WebSocket(`wss://api.timebase.live/livestream/${competitionId}/${index}`);
   
   // Connection opened
     socket.addEventListener("open", () => {
