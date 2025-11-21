@@ -13,33 +13,39 @@ import OnlinePredictionIcon from '@mui/icons-material/OnlinePrediction';
 function TimeBaseStation({ competitionId, index, onData }) {
 
   const [results, setResults] = useState(null);
-  const [color, setcolor] = useState("#CCCCCC");
+  const [color, setColor] = useState("#CCCCCC");
   
   const openWss = (index) => {
     //var ws = new WebSocket('wss://api.timebase.live/livestream/BayAreaSpeedcubin632024/1');
   
-    const socket = new WebSocket(`wss://api.timebase.live/livestream/${competitionId}/${index}`);
+    //const socket = new WebSocket(`wss://api.timebase.live/livestream/${competitionId}/${index}`);
+    const socket = new WebSocket(`wss://api.timebase.live/livestream/12345/${index}`);
   
   // Connection opened
     socket.addEventListener("open", () => {
-      setcolor("#00ff00")
+      //setcolor("#00ff00")
       ping();
     });
   
     socket.addEventListener("close", () => {
-      setcolor("#ff0000")
+      //setcolor("#ff0000")
     });
   
     // Listen for messages
     socket.addEventListener("message", (event) => {
+      setColor(socket.readyState == WebSocket.OPEN ? "#00ff00" : "#ff0000");
+      if(event.data == "pong") return;
       const data = JSON.parse(event.data);
+      if(data.message == "ping") return;
       setResults(data)
       
     });
 
     const ping = ()=>{
-      socket.send("ping");
-      setTimeout(ping, 3000);
+      if(socket.readyState == WebSocket.OPEN ){
+        socket.send("ping");
+        setTimeout(ping, 3000);
+      }
     }
 
   }
@@ -48,7 +54,9 @@ useEffect(()=>{
   onData(results, index)
 }, [results])
 
+useEffect(()=>{
   openWss(index)
+}, [index]);
 
   return (
     <Paper

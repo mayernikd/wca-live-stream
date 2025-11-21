@@ -29,7 +29,7 @@ function TimeBaseStations({ competitionId }) {
   return (
     <Grid container direction="column" alignItems="center" spacing={1}>
       <Grid container item xs={12}>
-          {[5,7,25,19,2,10].map((index) => (
+          {[1,2,3,4,5,6,7,8,9,10,11,12].map((index) => (
             <Grid key={"Players-" + index} container item xs={12}>
               <Grid container item xs={1}>
                 <Button

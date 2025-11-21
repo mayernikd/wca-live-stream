@@ -582,7 +582,7 @@ export function SendResults(player1, player2) {
         redirect: 'follow'
     };
 
-    fetch("https://app.singular.live/apiv1/datanodes/4uEqIEL6YSbGZbF4JwL5ac/data", requestOptions)
+    fetch("https://app.singular.live/apiv1/datanodes/2mWljcDAv0XLd2PqFCC5Fz/data", requestOptions)
         .then(response => response.text())
         .then(result => console.log(JSON.parse(result)))
         .catch(error => {
