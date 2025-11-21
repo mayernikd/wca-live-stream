@@ -28,10 +28,10 @@ export function uniq(arr) {
 }
 
 export function orderBy(arr, fns, orders = []) {
-  if (typeof fns === 'function') {
+  if (typeof fns === "function") {
     fns = [fns];
   }
-  if (typeof orders === 'string') {
+  if (typeof orders === "string") {
     orders = [orders];
   }
 
@@ -41,10 +41,10 @@ export function orderBy(arr, fns, orders = []) {
         const fnA = fn(a);
         const fnB = fn(b);
         const result = fnA > fnB ? 1 : fnA < fnB ? -1 : 0;
-        acc = orders[i] === 'desc' ? -result : result;
+        acc = orders[i] === "desc" ? -result : result;
       }
       return acc;
-    }, 0)
+    }, 0),
   );
 }
 
@@ -54,7 +54,7 @@ export function partition(arr, fn) {
       acc[fn(val, i, arr) ? 0 : 1].push(val);
       return acc;
     },
-    [[], []]
+    [[], []],
   );
 }
 
@@ -70,12 +70,16 @@ export function minBy(arr, fn) {
   return arr.reduce((x, y) => (fn(x) < fn(y) ? x : y));
 }
 
+export function toggleElement(arr, x) {
+  return arr.includes(x) ? arr.filter((y) => y !== x) : [x, ...arr];
+}
+
 export function clamp(x, left, right) {
   return Math.min(Math.max(x, left), right);
 }
 
 export function formatSentence(message) {
-  return capitalize(message).replace(/\.?$/, '.');
+  return capitalize(message).replace(/\.?$/, ".");
 }
 
 function capitalize(string) {
