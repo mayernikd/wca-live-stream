@@ -25,6 +25,8 @@ npm install
 npm start
 ```
 
+set NODE_OPTIONS=--openssl-legacy-provider
+
 Now you can visit [`localhost:3000`](http://localhost:3000) from your browser.
 
 Make sure to also start the API server.
@@ -35,3 +37,5 @@ Make sure to also start the API server.
 # Run Jest in watch mode.
 npm test
 ```
+
+
