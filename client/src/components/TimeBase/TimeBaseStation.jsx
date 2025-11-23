@@ -24,6 +24,12 @@ function TimeBaseStation({ competitionId, index, onData }) {
   // Connection opened
     socket.addEventListener("open", () => {
       //setcolor("#00ff00")
+
+      // GetTimeBaseStation(index, (ret) => {
+      //   if(ret !== null){
+      //     setResults(JSON.parse(ret));
+      //   }
+      // })
       ping();
     });
   
@@ -46,6 +52,10 @@ function TimeBaseStation({ competitionId, index, onData }) {
         socket.send("ping");
         setTimeout(ping, 3000);
       }
+    }
+
+    const refresh = () => {
+      setTimeout(ping, 5000);
     }
 
   }
